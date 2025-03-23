@@ -50,21 +50,14 @@ const rest = new REST({ version: '10' }).setToken(TOKEN);
 
 (async () => {
   try {
-    console.log('🔄 Clearing global commands...');
-    await rest.put(
-      Routes.applicationCommands(CLIENT_ID),
-      { body: [] } // clear global commands
-    );
-    console.log('✅ Cleared global commands!');
-
-    console.log('🔄 Registering guild slash commands...');
+    console.log('🔄 Registering slash commands...');
     await rest.put(
       Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID),
-      { body: commands }
+      { body: commands },
     );
-    console.log('✅ Guild slash commands registered!');
+    console.log('✅ Slash commands registered to guild!');
   } catch (error) {
-    console.error('❌ Error:', error);
+    console.error('❌ Error registering commands:', error);
   }
 })();
 
