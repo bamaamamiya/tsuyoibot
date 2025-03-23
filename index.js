@@ -27,11 +27,20 @@ const client = new Client({
 });
 
 let challenge = {
-  theme: "Default Theme",
-  vocab1: "語彙1",
-  vocab2: "語彙2",
-  vocab3: "語彙3",
-  example: "これは例文です。",
+  Daily: {
+    theme: "Default Daily Theme",
+    vocab1: "語彙1",
+    vocab2: "語彙2",
+    vocab3: "語彙3",
+    example: "これは例文です。",
+  },
+  Weekly: {
+    theme: "Default Weekly Theme",
+    vocab1: "語彙1",
+    vocab2: "語彙2",
+    vocab3: "語彙3",
+    example: "これは例文です。",
+  },
 };
 
 if (fs.existsSync("./challenges.json")) {
@@ -42,7 +51,17 @@ if (fs.existsSync("./challenges.json")) {
 const commands = [
   new SlashCommandBuilder()
     .setName("update_challenge")
-    .setDescription("Update weekly challenge")
+    .setDescription("Update daily or weekly challenge")
+    .addStringOption((option) =>
+      option
+        .setName("type")
+        .setDescription("Challenge type")
+        .setRequired(true)
+        .addChoices(
+          { name: "Weekly", value: "Weekly" },
+          { name: "Daily", value: "Daily" }
+        )
+    )
     .addStringOption((option) =>
       option
         .setName("theme")
@@ -67,7 +86,17 @@ const commands = [
 
   new SlashCommandBuilder()
     .setName("view_challenge")
-    .setDescription("View current challenge"),
+    .setDescription("View current challenge")
+    .addStringOption((option) =>
+      option
+        .setName("type")
+        .setDescription("Challenge type")
+        .setRequired(true)
+        .addChoices(
+          { name: "Weekly", value: "Weekly" },
+          { name: "Daily", value: "Daily" }
+        )
+    ),
 
   new SlashCommandBuilder()
     .setName("send_challenge")
@@ -114,33 +143,42 @@ client.on("interactionCreate", async (interaction) => {
       });
       return;
     }
-    challenge.theme = interaction.options.getString("theme");
-    challenge.vocab1 = interaction.options.getString("vocab1");
-    challenge.vocab2 = interaction.options.getString("vocab2");
-    challenge.vocab3 = interaction.options.getString("vocab3");
-    challenge.example = interaction.options.getString("example");
+
+    const type = interaction.options.getString("type"); // Daily or Weekly
+    challenge[type].theme = interaction.options.getString("theme");
+    challenge[type].vocab1 = interaction.options.getString("vocab1");
+    challenge[type].vocab2 = interaction.options.getString("vocab2");
+    challenge[type].vocab3 = interaction.options.getString("vocab3");
+    challenge[type].example = interaction.options.getString("example");
 
     fs.writeFileSync("./challenges.json", JSON.stringify(challenge, null, 2));
 
-    await interaction.reply(`✅ Challenge updated!\nTheme: ${challenge.theme}`);
+    await interaction.reply(
+      `✅ ${type} Challenge updated!\nTheme: ${challenge[type].theme}`
+    );
   } else if (interaction.commandName === "view_challenge") {
-    const message = `\n**📌 Current Vocab Challenge**\n**Theme:** ${challenge.theme}\n\n1️⃣ ${challenge.vocab1}\n2️⃣ ${challenge.vocab2}\n3️⃣ ${challenge.vocab3}\n\n**Example:**\n${challenge.example}`;
+    const type = interaction.options.getString("type");
+    const current = challenge[type];
+    const message = `\n**📌 Current ${type} Vocab Challenge**\n**Theme:** ${current.theme}\n\n1️⃣ ${current.vocab1}\n2️⃣ ${current.vocab2}\n3️⃣ ${current.vocab3}\n\n**Example:**\n${current.example}`;
     await interaction.reply({ content: message, ephemeral: true });
-  } else if (interaction.commandName === 'send_challenge') {
-		if (!member.permissions.has(PermissionsBitField.Flags.Administrator)) {
-			await interaction.reply({ content: 'Only admins can send the challenge.', ephemeral: true });
-			return;
-		}
-		const type = interaction.options.getString('type'); // <-- Ambil pilihan
-		const channel = client.channels.cache.get(CHANNEL_ID);
-		if (channel) {
-			const message = `\n**📌 ${type} Vocab Challenge**\n**Theme:** ${challenge.theme}\n\n1️⃣ ${challenge.vocab1}\n2️⃣ ${challenge.vocab2}\n3️⃣ ${challenge.vocab3}\n\n**Example:**\n${challenge.example}`;
-			channel.send(message);
-			await interaction.reply(`📢 ${type} Challenge sent to channel!`);
-		} else {
-			await interaction.reply('⚠️ Channel not found!');
-		}
-	}
+  } else if (interaction.commandName === "send_challenge") {
+    if (!member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+      await interaction.reply({
+        content: "Only admins can send the challenge.",
+        ephemeral: true,
+      });
+      return;
+    }
+    const type = interaction.options.getString("type"); // <-- Ambil pilihan
+    const channel = client.channels.cache.get(CHANNEL_ID);
+    if (channel) {
+      const message = `\n**📌 ${type} Vocab Challenge**\n**Theme:** ${challenge.theme}\n\n1️⃣ ${challenge.vocab1}\n2️⃣ ${challenge.vocab2}\n3️⃣ ${challenge.vocab3}\n\n**Example:**\n${challenge.example}`;
+      channel.send(message);
+      await interaction.reply(`📢 ${type} Challenge sent to channel!`);
+    } else {
+      await interaction.reply("⚠️ Channel not found!");
+    }
+  }
 });
 
 client.on("error", console.error);
