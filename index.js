@@ -154,8 +154,20 @@ client.on("interactionCreate", async (interaction) => {
 	} else if (interaction.commandName === "view_challenge") {
 		const type = interaction.options.getString("type");
 		const current = challenge[type];
-		const message = `\n**📌 ${type} Vocab Challenge**\n**Theme:** ${current.theme}\n\n1️⃣ ${current.vocab1}\n2️⃣ ${current.vocab2}\n3️⃣ ${current.vocab3}\n\n**Example:**\n${current.example}`;
-		await interaction.reply({ content: message, ephemeral: true });
+	
+		const embed = new EmbedBuilder()
+			.setTitle(`📌 ${type} Vocab Challenge`)
+			.addFields(
+				{ name: "📚 Theme", value: current.theme, inline: false },
+				{ name: "1️⃣ Vocab 1", value: current.vocab1, inline: true },
+				{ name: "2️⃣ Vocab 2", value: current.vocab2, inline: true },
+				{ name: "3️⃣ Vocab 3", value: current.vocab3, inline: true },
+				{ name: "📝 Example", value: current.example, inline: false }
+			)
+			.setColor(type === "Daily" ? 0x00bfff : 0xffa500)
+			.setTimestamp();
+	
+		await interaction.reply({ embeds: [embed], ephemeral: true });
 	} else if (interaction.commandName === "send_challenge") {
 		if (!member.permissions.has(PermissionsBitField.Flags.Administrator)) {
 			await interaction.reply({
