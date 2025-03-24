@@ -186,9 +186,9 @@ client.on("interactionCreate", async (interaction) => {
 				.setTitle(`📌 ${type} Vocab Challenge`)
 				.addFields(
 					{ name: "📚 Theme", value: current.theme, inline: false },
-					{ name: "1️⃣", value: current.vocab1, inline: false },
-					{ name: "2️⃣", value: current.vocab2, inline: false },
-					{ name: "3️⃣", value: current.vocab3, inline: false },
+					{ name: "1️⃣", value: current.vocab1, inline: true },
+					{ name: "2️⃣", value: current.vocab2, inline: true },
+					{ name: "3️⃣", value: current.vocab3, inline: true },
 					{ name: "📝 Example", value: current.example, inline: false }
 				)
 				.setColor(type === "Daily" ? 0x00bfff : 0xffa500) // Blue for Daily, Orange for Weekly
