@@ -158,11 +158,11 @@ client.on("interactionCreate", async (interaction) => {
 		const embed = new EmbedBuilder()
 			.setTitle(`📌 ${type} Vocab Challenge`)
 			.addFields(
+				{ name: "📚 Theme", value: current.theme, inline: false },
 				{ name: "1️⃣ Vocab 1", value: current.vocab1, inline: true },
-        { name: "2️⃣ Vocab 2", value: current.vocab2, inline: true },
-        { name: "3️⃣ Vocab 3", value: current.vocab3, inline: true },
-        { name: "\u200B", value: "\u200B" }, // Empty line spacer
-        { name: "**📖 Example Sentence**", value: current.example, inline: false }
+				{ name: "2️⃣ Vocab 2", value: current.vocab2, inline: true },
+				{ name: "3️⃣ Vocab 3", value: current.vocab3, inline: true },
+				{ name: "📝 Example", value: current.example, inline: false }
 			)
 			.setColor(type === "Daily" ? 0x00bfff : 0xffa500)
 			.setTimestamp();
@@ -185,11 +185,12 @@ client.on("interactionCreate", async (interaction) => {
 			const embed = new EmbedBuilder()
 				.setTitle(`📌 ${type} Vocab Challenge`)
 				.addFields(
-				{ name: "1️⃣ Vocab 1", value: current.vocab1, inline: true },
-        { name: "2️⃣ Vocab 2", value: current.vocab2, inline: true },
-        { name: "3️⃣ Vocab 3", value: current.vocab3, inline: true },
-        { name: "\u200B", value: "\u200B" }, // Empty line spacer
-        { name: "**📖 Example Sentence**", value: current.example, inline: false }
+					{ name: "📚 Theme", value: current.theme, inline: false },
+					{ name: "\u200B", value: "\u200B" }, // Empty line spacer
+					{ name: "1️⃣ Vocab 1", value: current.vocab1, inline: false },
+					{ name: "2️⃣ Vocab 2", value: current.vocab2, inline: false },
+					{ name: "3️⃣ Vocab 3", value: current.vocab3, inline: false },
+					{ name: "📝 Example", value: current.example, inline: false }
 				)
 				.setColor(type === "Daily" ? 0x00bfff : 0xffa500) // Blue for Daily, Orange for Weekly
 				.setTimestamp();
