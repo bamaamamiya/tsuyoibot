@@ -1,220 +1,177 @@
-const {
-  Client,
-  GatewayIntentBits,
-  Partials,
-  REST,
-  Routes,
-  SlashCommandBuilder,
-  PermissionsBitField,
-  EmbedBuilder
-} = require("discord.js");
-const dotenv = require("dotenv");
-const fs = require("fs");
+const { Client, GatewayIntentBits, SlashCommandBuilder, REST, Routes, EmbedBuilder } = require('discord.js');
+const { TOKEN, CLIENT_ID, GUILD_ID, CATEGORY_ID } = require('./config.json');
+const fs = require('fs');
 
-dotenv.config();
+const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
-const TOKEN = process.env.BOT_TOKEN;
-const CLIENT_ID = process.env.CLIENT_ID;
-const GUILD_ID = process.env.GUILD_ID;
-const CHANNEL_ID = process.env.CHANNEL_ID;
+// Load challenge.json
+const challenge = JSON.parse(fs.readFileSync('./challenge.json', 'utf8'));
 
-const client = new Client({
-  intents: [
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent,
-  ],
-  partials: [Partials.Channel],
-});
+// Register commands
+const commands = [
+  new SlashCommandBuilder()
+    .setName('show_challenge')
+    .setDescription('Show the current challenge')
+    .addStringOption(option =>
+      option.setName('type')
+        .setDescription('Type of challenge')
+        .setRequired(true)
+        .addChoices(
+          { name: 'Daily', value: 'Daily' },
+          { name: 'Weekly', value: 'Weekly' },
+        )),
+  new SlashCommandBuilder()
+    .setName('send_challenge')
+    .setDescription('Send challenge to specific channel')
+    .addStringOption(option =>
+      option.setName('type')
+        .setDescription('Type of challenge')
+        .setRequired(true)
+        .addChoices(
+          { name: 'Daily', value: 'Daily' },
+          { name: 'Weekly', value: 'Weekly' },
+        ))
+    .addChannelOption(option =>
+      option.setName('channel')
+        .setDescription('Target channel')
+        .setRequired(true)),
+  new SlashCommandBuilder()
+    .setName('send_challenge_to_category')
+    .setDescription('Send challenge to all channels in category')
+    .addStringOption(option =>
+      option.setName('type')
+        .setDescription('Type of challenge')
+        .setRequired(true)
+        .addChoices(
+          { name: 'Daily', value: 'Daily' },
+          { name: 'Weekly', value: 'Weekly' },
+        )),
+].map(command => command.toJSON());
 
-let challenge = {
-  Daily: {
-    theme: "Default Daily Theme",
-    vocab1: "語彙1",
-    vocab2: "語彙2",
-    vocab3: "語彙3",
-    example: "これは例文です。",
-  },
-  Weekly: {
-    theme: "Default Weekly Theme",
-  },
-};
-
-if (fs.existsSync("./challenges.json")) {
-  const rawData = fs.readFileSync("./challenges.json");
-  challenge = JSON.parse(rawData);
-}
-
-// === Commands ===
-
-const updateChallengeCmd = new SlashCommandBuilder()
-  .setName("update_challenge")
-  .setDescription("Update daily or weekly challenge")
-  .addStringOption(option =>
-    option
-      .setName("type")
-      .setDescription("Challenge type")
-      .setRequired(true)
-      .addChoices(
-        { name: "Weekly", value: "Weekly" },
-        { name: "Daily", value: "Daily" }
-      )
-  )
-  .addStringOption(option =>
-    option.setName("theme").setDescription("Challenge theme").setRequired(true)
-  )
-  .addStringOption(option =>
-    option.setName("vocab1").setDescription("Vocab 1 (Daily Only)").setRequired(false)
-  )
-  .addStringOption(option =>
-    option.setName("vocab2").setDescription("Vocab 2 (Daily Only)").setRequired(false)
-  )
-  .addStringOption(option =>
-    option.setName("vocab3").setDescription("Vocab 3 (Daily Only)").setRequired(false)
-  )
-  .addStringOption(option =>
-    option.setName("example").setDescription("Example sentence (Daily Only)").setRequired(false)
-  );
-
-const viewChallengeCmd = new SlashCommandBuilder()
-  .setName("view_challenge")
-  .setDescription("View current challenge")
-  .addStringOption(option =>
-    option
-      .setName("type")
-      .setDescription("Challenge type")
-      .setRequired(true)
-      .addChoices(
-        { name: "Weekly", value: "Weekly" },
-        { name: "Daily", value: "Daily" }
-      )
-  );
-
-const sendChallengeCmd = new SlashCommandBuilder()
-  .setName("send_challenge")
-  .setDescription("Send current challenge to the channel")
-  .addStringOption(option =>
-    option
-      .setName("type")
-      .setDescription("Challenge type")
-      .setRequired(true)
-      .addChoices(
-        { name: "Weekly", value: "Weekly" },
-        { name: "Daily", value: "Daily" }
-      )
-  );
-
-const commands = [updateChallengeCmd, viewChallengeCmd, sendChallengeCmd].map(cmd => cmd.toJSON());
-
-// === Register Commands ===
-const rest = new REST({ version: "10" }).setToken(TOKEN);
+const rest = new REST({ version: '10' }).setToken(TOKEN);
 
 (async () => {
   try {
-    console.log("🔄 Registering slash commands...");
-    await rest.put(Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID), {
-      body: commands,
-    });
-    console.log("✅ Slash commands registered!");
+    console.log('Started refreshing application (/) commands.');
+
+    await rest.put(
+      Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID),
+      { body: commands },
+    );
+
+    console.log('Successfully reloaded application (/) commands.');
   } catch (error) {
-    console.error("❌ Error registering commands:", error);
+    console.error(error);
   }
 })();
 
-// === Event Handling ===
-
-client.on("ready", () => {
-  console.log(`🤖 Logged in as ${client.user.tag}`);
+// Command Handlers
+client.on('ready', () => {
+  console.log(`Logged in as ${client.user.tag}`);
 });
 
-client.on("interactionCreate", async (interaction) => {
-  if (!interaction.isCommand()) return;
+client.on('interactionCreate', async interaction => {
+  if (!interaction.isChatInputCommand()) return;
 
-  const member = await interaction.guild.members.fetch(interaction.user.id);
-
-  if (interaction.commandName === "update_challenge") {
-    if (!member.permissions.has(PermissionsBitField.Flags.Administrator)) {
-      await interaction.reply({
-        content: "Only admins can update the challenge.",
-        ephemeral: true,
-      });
-      return;
-    }
-
-    const type = interaction.options.getString("type");
-    challenge[type].theme = interaction.options.getString("theme");
-
-    if (type === "Daily") {
-      challenge[type].vocab1 = interaction.options.getString("vocab1") || "語彙1";
-      challenge[type].vocab2 = interaction.options.getString("vocab2") || "語彙2";
-      challenge[type].vocab3 = interaction.options.getString("vocab3") || "語彙3";
-      challenge[type].example = interaction.options.getString("example") || "これは例文です。";
-    }
-
-    fs.writeFileSync("./challenges.json", JSON.stringify(challenge, null, 2));
-    await interaction.reply(`✅ ${type} Challenge updated! Theme: ${challenge[type].theme}`);
-  }
-
-  if (interaction.commandName === "view_challenge") {
-    const type = interaction.options.getString("type");
+  if (interaction.commandName === 'show_challenge') {
+    const type = interaction.options.getString('type');
     const current = challenge[type];
 
     const embed = new EmbedBuilder()
       .setTitle(`📌 ${type} Vocab Challenge`)
       .addFields(
-        { name: "📚 Theme", value: current.theme, inline: false },
-        ...(type === "Daily"
-          ? [
-              { name: "1️⃣ Vocab 1", value: current.vocab1, inline: true },
-              { name: "2️⃣ Vocab 2", value: current.vocab2, inline: true },
-              { name: "3️⃣ Vocab 3", value: current.vocab3, inline: true },
-              { name: "📝 Example", value: current.example, inline: false },
-            ]
-          : [])
+        { name: "📚 Theme", value: current.theme, inline: false }
       )
-      .setColor(type === "Daily" ? 0x00bfff : 0xffa500)
-      .setTimestamp();
+      .setColor(0x00AE86);
 
-    await interaction.reply({ embeds: [embed], ephemeral: true });
+    if (type === "Daily") {
+      embed.addFields(
+        { name: "🌐 Vocab 1", value: current.vocab1, inline: true },
+        { name: "🌐 Vocab 2", value: current.vocab2, inline: true },
+        { name: "🌐 Vocab 3", value: current.vocab3, inline: true },
+        { name: "🌟 Example Sentence", value: current.example, inline: false }
+      );
+    }
+
+    await interaction.reply({ embeds: [embed] });
   }
 
-  if (interaction.commandName === "send_challenge") {
-    if (!member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+  if (interaction.commandName === 'send_challenge') {
+    const type = interaction.options.getString('type');
+    const targetChannel = interaction.options.getChannel('channel');
+
+    if (!targetChannel.isTextBased()) {
       await interaction.reply({
-        content: "Only admins can send the challenge.",
+        content: "❌ Target channel must be a text-based channel.",
         ephemeral: true,
       });
       return;
     }
 
-    const type = interaction.options.getString("type");
     const current = challenge[type];
-    const channel = client.channels.cache.get(CHANNEL_ID);
 
-    if (channel) {
-      const embed = new EmbedBuilder()
-        .setTitle(`📌 ${type} Vocab Challenge`)
-        .addFields(
-          { name: "📚 Theme", value: current.theme, inline: false },
-          ...(type === "Daily"
-            ? [
-                { name: "1️⃣ Vocab 1", value: current.vocab1, inline: true },
-                { name: "2️⃣ Vocab 2", value: current.vocab2, inline: true },
-                { name: "3️⃣ Vocab 3", value: current.vocab3, inline: true },
-                { name: "📝 Example", value: current.example, inline: false },
-              ]
-            : [])
-        )
-        .setColor(type === "Daily" ? 0x00bfff : 0xffa500)
-        .setTimestamp();
+    const embed = new EmbedBuilder()
+      .setTitle(`📌 ${type} Vocab Challenge`)
+      .addFields(
+        { name: "📚 Theme", value: current.theme, inline: false }
+      )
+      .setColor(0x00AE86);
 
-      await channel.send({ embeds: [embed] });
-      await interaction.reply(`📢 ${type} Challenge sent to channel!`);
-    } else {
-      await interaction.reply("⚠️ Channel not found!");
+    if (type === "Daily") {
+      embed.addFields(
+        { name: "🌐 Vocab 1", value: current.vocab1, inline: true },
+        { name: "🌐 Vocab 2", value: current.vocab2, inline: true },
+        { name: "🌐 Vocab 3", value: current.vocab3, inline: true },
+        { name: "🌟 Example Sentence", value: current.example, inline: false }
+      );
     }
+
+    await targetChannel.send({ embeds: [embed] });
+    await interaction.reply(`✅ ${type} Challenge sent to ${targetChannel}`);
+  }
+
+  if (interaction.commandName === 'send_challenge_to_category') {
+    const type = interaction.options.getString('type');
+    const category = interaction.guild.channels.cache.get(CATEGORY_ID);
+
+    if (!category || category.type !== 4) { // 4 = GuildCategory
+      await interaction.reply({
+        content: "❌ Invalid CATEGORY_ID or category not found.",
+        ephemeral: true,
+      });
+      return;
+    }
+
+    const current = challenge[type];
+
+    const embed = new EmbedBuilder()
+      .setTitle(`📌 ${type} Vocab Challenge`)
+      .addFields(
+        { name: "📚 Theme", value: current.theme, inline: false }
+      )
+      .setColor(0x00AE86);
+
+    if (type === "Daily") {
+      embed.addFields(
+        { name: "🌐 Vocab 1", value: current.vocab1, inline: true },
+        { name: "🌐 Vocab 2", value: current.vocab2, inline: true },
+        { name: "🌐 Vocab 3", value: current.vocab3, inline: true },
+        { name: "🌟 Example Sentence", value: current.example, inline: false }
+      );
+    }
+
+    let successCount = 0;
+
+    category.children.cache.forEach(channel => {
+      if (channel.isTextBased()) {
+        channel.send({ embeds: [embed] }).then(() => {
+          successCount++;
+        }).catch(err => console.error(`Failed to send to ${channel.name}:`, err));
+      }
+    });
+
+    await interaction.reply(`✅ ${type} Challenge sent to ${successCount} channels in category.`);
   }
 });
 
-client.on("error", console.error);
 client.login(TOKEN);
