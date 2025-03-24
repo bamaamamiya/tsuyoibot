@@ -90,7 +90,7 @@ const viewChallengeCmd = new SlashCommandBuilder()
       )
   );
 
-const sendChallengeCmd = new SlashCommandBuilder()
+	const sendChallengeCmd = new SlashCommandBuilder()
   .setName("send_challenge")
   .setDescription("Send current challenge to the channel")
   .addStringOption(option =>
@@ -102,6 +102,12 @@ const sendChallengeCmd = new SlashCommandBuilder()
         { name: "Weekly", value: "Weekly" },
         { name: "Daily", value: "Daily" }
       )
+  )
+  .addChannelOption(option =>
+    option
+      .setName("channel")
+			.setDescription("Channel to send the challenge to")
+      .setRequired(false)
   );
 
 const commands = [updateChallengeCmd, viewChallengeCmd, sendChallengeCmd].map(cmd => cmd.toJSON());
@@ -179,41 +185,44 @@ client.on("interactionCreate", async (interaction) => {
   }
 
   if (interaction.commandName === "send_challenge") {
-    if (!member.permissions.has(PermissionsBitField.Flags.Administrator)) {
-      await interaction.reply({
-        content: "Only admins can send the challenge.",
-        ephemeral: true,
-      });
-      return;
-    }
-
-    const type = interaction.options.getString("type");
-    const current = challenge[type];
-    const channel = client.channels.cache.get(CHANNEL_ID);
-
-    if (channel) {
-      const embed = new EmbedBuilder()
-        .setTitle(`📌 ${type} Vocab Challenge`)
-        .addFields(
-          { name: "📚 Theme", value: current.theme, inline: false },
-          ...(type === "Daily"
-            ? [
-                { name: "1️⃣ Vocab 1", value: current.vocab1, inline: true },
-                { name: "2️⃣ Vocab 2", value: current.vocab2, inline: true },
-                { name: "3️⃣ Vocab 3", value: current.vocab3, inline: true },
-                { name: "📝 Example", value: current.example, inline: false },
-              ]
-            : [])
-        )
-        .setColor(type === "Daily" ? 0x00bfff : 0xffa500)
-        .setTimestamp();
-
-      await channel.send({ embeds: [embed] });
-      await interaction.reply(`📢 ${type} Challenge sent to channel!`);
-    } else {
-      await interaction.reply("⚠️ Channel not found!");
-    }
-  }
+		if (!member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+			await interaction.reply({
+				content: "Only admins can send the challenge.",
+				ephemeral: true,
+			});
+			return;
+		}
+	
+		const type = interaction.options.getString("type");
+		const targetChannel = interaction.options.getChannel("channel"); // Get selected channel
+		const current = challenge[type];
+		const channel = targetChannel || client.channels.cache.get(CHANNEL_ID); // Use selected or fallback
+	
+		if (channel && channel.isTextBased()) {
+			const embed = new EmbedBuilder()
+				.setTitle(`📌 ${type} Vocab Challenge`)
+				.addFields(
+					{ name: "📚 Theme", value: current.theme, inline: false },
+					...(type === "Daily"
+						? [
+								{ name: "1️⃣ Vocab 1", value: current.vocab1, inline: true },
+								{ name: "2️⃣ Vocab 2", value: current.vocab2, inline: true },
+								{ name: "3️⃣ Vocab 3", value: current.vocab3, inline: true },
+								{ name: "📝 Example", value: current.example, inline: false },
+							]
+						: [])
+				)
+				.setColor(type === "Daily" ? 0x00bfff : 0xffa500)
+				.setTimestamp();
+	
+			await channel.send({ embeds: [embed] });
+			await interaction.reply(`📢 ${type} Challenge sent to ${channel}!`);
+		} else {
+			await interaction.reply("⚠️ Channel not found or invalid!");
+		}
+	}
+	
+	
 });
 
 client.on("error", console.error);
