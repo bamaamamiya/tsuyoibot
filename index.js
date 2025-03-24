@@ -17,7 +17,6 @@ const TOKEN = process.env.BOT_TOKEN;
 const CLIENT_ID = process.env.CLIENT_ID;
 const GUILD_ID = process.env.GUILD_ID;
 const CHANNEL_ID = process.env.CHANNEL_ID;
-const CATEGORY_ID = process.env.CATEGORY_ID;
 
 const client = new Client({
   intents: [
@@ -105,7 +104,7 @@ const sendChallengeCmd = new SlashCommandBuilder()
       )
   );
 
-const commands = [updateChallengeCmd, viewChallengeCmd, sendChallengeCmd,listCategoryChannelsCmd].map(cmd => cmd.toJSON());
+const commands = [updateChallengeCmd, viewChallengeCmd, sendChallengeCmd].map(cmd => cmd.toJSON());
 
 // === Register Commands ===
 const rest = new REST({ version: "10" }).setToken(TOKEN);
