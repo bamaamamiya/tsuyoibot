@@ -158,11 +158,11 @@ client.on("interactionCreate", async (interaction) => {
 		const embed = new EmbedBuilder()
 			.setTitle(`📌 ${type} Vocab Challenge`)
 			.addFields(
-				{ name: "📚 Theme", value: current.theme, inline: false },
 				{ name: "1️⃣ Vocab 1", value: current.vocab1, inline: true },
-				{ name: "2️⃣ Vocab 2", value: current.vocab2, inline: true },
-				{ name: "3️⃣ Vocab 3", value: current.vocab3, inline: true },
-				{ name: "📝 Example", value: current.example, inline: false }
+        { name: "2️⃣ Vocab 2", value: current.vocab2, inline: true },
+        { name: "3️⃣ Vocab 3", value: current.vocab3, inline: true },
+        { name: "\u200B", value: "\u200B" }, // Empty line spacer
+        { name: "**📖 Example Sentence**", value: current.example, inline: false }
 			)
 			.setColor(type === "Daily" ? 0x00bfff : 0xffa500)
 			.setTimestamp();
@@ -183,43 +183,23 @@ client.on("interactionCreate", async (interaction) => {
 	
 		if (channel) {
 			const embed = new EmbedBuilder()
-				.setTitl} else if (interaction.commandName === "send_challenge") {
-					if (!member.permissions.has(PermissionsBitField.Flags.Administrator)) {
-						await interaction.reply({
-							content: "Only admins can send the challenge.",
-							ephemeral: true,
-						});
-						return;
-					}
-				
-					const type = interaction.options.getString("type"); // Daily or Weekly
-					const channel = client.channels.cache.get(CHANNEL_ID);
-				
-					if (channel) {
-						const current = challenge[type];
-				
-						const embed = new EmbedBuilder()
-							.setTitle(`📌 ${type} Vocab Challenge`)
-							.setDescription(`**Theme:** ${current.theme}`)
-							.addFields(
-								{ name: "1️⃣ Vocab 1", value: current.vocab1, inline: true },
-								{ name: "2️⃣ Vocab 2", value: current.vocab2, inline: true },
-								{ name: "3️⃣ Vocab 3", value: current.vocab3, inline: true },
-								{ name: "\u200B", value: "\u200B" }, // Empty line spacer
-								{ name: "**📖 Example Sentence**", value: current.example, inline: false }
-							)
-							.setColor("#00BFFF")
-							.setTimestamp();
-				
-						channel.send({ embeds: [embed] });
-				
-						await interaction.reply(`📢 ${type} Challenge sent to channel!`);
-					} else {
-						await interaction.reply("⚠️ Channel not found!");
-					}
-				}
-				}
-				
+				.setTitle(`📌 ${type} Vocab Challenge`)
+				.addFields(
+				{ name: "1️⃣ Vocab 1", value: current.vocab1, inline: true },
+        { name: "2️⃣ Vocab 2", value: current.vocab2, inline: true },
+        { name: "3️⃣ Vocab 3", value: current.vocab3, inline: true },
+        { name: "\u200B", value: "\u200B" }, // Empty line spacer
+        { name: "**📖 Example Sentence**", value: current.example, inline: false }
+				)
+				.setColor(type === "Daily" ? 0x00bfff : 0xffa500) // Blue for Daily, Orange for Weekly
+				.setTimestamp();
+	
+			await channel.send({ embeds: [embed] });
+			await interaction.reply(`📢 ${type} Challenge sent to channel!`);
+		} else {
+			await interaction.reply("⚠️ Channel not found!");
+		}
+	}
 });
 
 client.on("error", console.error);
