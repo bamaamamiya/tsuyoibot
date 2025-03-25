@@ -6,7 +6,7 @@ const {
   Routes,
   SlashCommandBuilder,
   PermissionsBitField,
-  EmbedBuilder
+  EmbedBuilder,
 } = require("discord.js");
 const dotenv = require("dotenv");
 const fs = require("fs");
@@ -50,7 +50,7 @@ if (fs.existsSync("./challenges.json")) {
 const updateChallengeCmd = new SlashCommandBuilder()
   .setName("update_challenge")
   .setDescription("Update daily or weekly challenge")
-  .addStringOption(option =>
+  .addStringOption((option) =>
     option
       .setName("type")
       .setDescription("Challenge type")
@@ -60,26 +60,38 @@ const updateChallengeCmd = new SlashCommandBuilder()
         { name: "Daily", value: "Daily" }
       )
   )
-  .addStringOption(option =>
+  .addStringOption((option) =>
     option.setName("theme").setDescription("Challenge theme").setRequired(true)
   )
-  .addStringOption(option =>
-    option.setName("vocab1").setDescription("Vocab 1 (Daily Only)").setRequired(false)
+  .addStringOption((option) =>
+    option
+      .setName("vocab1")
+      .setDescription("Vocab 1 (Daily Only)")
+      .setRequired(false)
   )
-  .addStringOption(option =>
-    option.setName("vocab2").setDescription("Vocab 2 (Daily Only)").setRequired(false)
+  .addStringOption((option) =>
+    option
+      .setName("vocab2")
+      .setDescription("Vocab 2 (Daily Only)")
+      .setRequired(false)
   )
-  .addStringOption(option =>
-    option.setName("vocab3").setDescription("Vocab 3 (Daily Only)").setRequired(false)
+  .addStringOption((option) =>
+    option
+      .setName("vocab3")
+      .setDescription("Vocab 3 (Daily Only)")
+      .setRequired(false)
   )
-  .addStringOption(option =>
-    option.setName("example").setDescription("Example sentence (Daily Only)").setRequired(false)
+  .addStringOption((option) =>
+    option
+      .setName("example")
+      .setDescription("Example sentence (Daily Only)")
+      .setRequired(false)
   );
 
 const viewChallengeCmd = new SlashCommandBuilder()
   .setName("view_challenge")
   .setDescription("View current challenge")
-  .addStringOption(option =>
+  .addStringOption((option) =>
     option
       .setName("type")
       .setDescription("Challenge type")
@@ -90,10 +102,10 @@ const viewChallengeCmd = new SlashCommandBuilder()
       )
   );
 
-	const sendChallengeCmd = new SlashCommandBuilder()
+const sendChallengeCmd = new SlashCommandBuilder()
   .setName("send_challenge")
   .setDescription("Send current challenge to the channel")
-  .addStringOption(option =>
+  .addStringOption((option) =>
     option
       .setName("type")
       .setDescription("Challenge type")
@@ -103,14 +115,16 @@ const viewChallengeCmd = new SlashCommandBuilder()
         { name: "Daily", value: "Daily" }
       )
   )
-  .addChannelOption(option =>
+  .addChannelOption((option) =>
     option
       .setName("channel")
-			.setDescription("Channel to send the challenge to")
+      .setDescription("Channel to send the challenge to")
       .setRequired(false)
   );
 
-const commands = [updateChallengeCmd, viewChallengeCmd, sendChallengeCmd].map(cmd => cmd.toJSON());
+const commands = [updateChallengeCmd, viewChallengeCmd, sendChallengeCmd].map(
+  (cmd) => cmd.toJSON()
+);
 
 // === Register Commands ===
 const rest = new REST({ version: "10" }).setToken(TOKEN);
@@ -151,14 +165,20 @@ client.on("interactionCreate", async (interaction) => {
     challenge[type].theme = interaction.options.getString("theme");
 
     if (type === "Daily") {
-      challenge[type].vocab1 = interaction.options.getString("vocab1") || "語彙1";
-      challenge[type].vocab2 = interaction.options.getString("vocab2") || "語彙2";
-      challenge[type].vocab3 = interaction.options.getString("vocab3") || "語彙3";
-      challenge[type].example = interaction.options.getString("example") || "これは例文です。";
+      challenge[type].vocab1 =
+        interaction.options.getString("vocab1") || "語彙1";
+      challenge[type].vocab2 =
+        interaction.options.getString("vocab2") || "語彙2";
+      challenge[type].vocab3 =
+        interaction.options.getString("vocab3") || "語彙3";
+      challenge[type].example =
+        interaction.options.getString("example") || "これは例文です。";
     }
 
     fs.writeFileSync("./challenges.json", JSON.stringify(challenge, null, 2));
-    await interaction.reply(`✅ ${type} Challenge updated! Theme: ${challenge[type].theme}`);
+    await interaction.reply(
+      `✅ ${type} Challenge updated! Theme: ${challenge[type].theme}`
+    );
   }
 
   if (interaction.commandName === "view_challenge") {
@@ -185,44 +205,74 @@ client.on("interactionCreate", async (interaction) => {
   }
 
   if (interaction.commandName === "send_challenge") {
-		if (!member.permissions.has(PermissionsBitField.Flags.Administrator)) {
-			await interaction.reply({
-				content: "Only admins can send the challenge.",
-				ephemeral: true,
-			});
-			return;
-		}
-	
-		const type = interaction.options.getString("type");
-		const targetChannel = interaction.options.getChannel("channel"); // Get selected channel
-		const current = challenge[type];
-		const channel = targetChannel || client.channels.cache.get(CHANNEL_ID); // Use selected or fallback
-	
-		if (channel && channel.isTextBased()) {
-			const embed = new EmbedBuilder()
-				.setTitle(`📌 ${type} Vocab Challenge`)
-				.addFields(
-					{ name: "📚 Theme", value: current.theme, inline: false },
-					...(type === "Daily"
-						? [
-								{ name: "1️⃣ Vocab 1", value: current.vocab1, inline: true },
-								{ name: "2️⃣ Vocab 2", value: current.vocab2, inline: true },
-								{ name: "3️⃣ Vocab 3", value: current.vocab3, inline: true },
-								{ name: "📝 Example", value: current.example, inline: false },
-							]
-						: [])
-				)
-				.setColor(type === "Daily" ? 0x00bfff : 0xffa500)
-				.setTimestamp();
-	
-			await channel.send({ embeds: [embed] });
-			await interaction.reply(`📢 ${type} Challenge sent to ${channel}!`);
-		} else {
-			await interaction.reply("⚠️ Channel not found or invalid!");
-		}
-	}
-	
-	
+    if (!member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+      await interaction.reply({
+        content: "Only admins can send the challenge.",
+        ephemeral: true,
+      });
+      return;
+    }
+
+    const type = interaction.options.getString("type");
+    const targetChannel = interaction.options.getChannel("channel"); // Get selected channel
+    const channel = targetChannel || client.channels.cache.get(CHANNEL_ID); // Use selected or fallback
+
+    console.log(
+      `🔎 Selected Channel: ${
+        targetChannel ? targetChannel.id : "None"
+      }, Fallback: ${CHANNEL_ID}`
+    );
+
+    // Validasi tipe challenge
+    if (!challenge[type]) {
+      await interaction.reply({
+        content: "⚠️ Invalid challenge type!",
+        ephemeral: true,
+      });
+      return;
+    }
+
+    const current = challenge[type];
+
+    if (!channel || !channel.isTextBased()) {
+      await interaction.reply({
+        content: "⚠️ Channel not found or invalid!",
+        ephemeral: true,
+      });
+      return;
+    }
+
+    try {
+      await interaction.deferReply({ ephemeral: true }); // Menghindari timeout jika proses lama
+
+      const embed = new EmbedBuilder()
+        .setTitle(`📌 ${type} Vocab Challenge`)
+        .addFields(
+          { name: "📚 Theme", value: current.theme, inline: false },
+          ...(type === "Daily"
+            ? [
+                { name: "1️⃣ Vocab 1", value: current.vocab1, inline: true },
+                { name: "2️⃣ Vocab 2", value: current.vocab2, inline: true },
+                { name: "3️⃣ Vocab 3", value: current.vocab3, inline: true },
+                { name: "📝 Example", value: current.example, inline: false },
+              ]
+            : [])
+        )
+        .setColor(type === "Daily" ? 0x00bfff : 0xffa500)
+        .setTimestamp();
+
+      await channel.send({ embeds: [embed] }); // Mengirim pesan ke channel
+
+      await interaction.editReply(
+        `📢 ${type} Challenge sent to <#${channel.id}>!`
+      );
+    } catch (error) {
+      console.error("❌ Error sending message:", error);
+      await interaction.editReply({
+        content: "⚠️ Failed to send message. Please check bot permissions!",
+      });
+    }
+  }
 });
 
 client.on("error", console.error);
