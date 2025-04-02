@@ -149,39 +149,34 @@ client.on("ready", () => {
   console.log(`🤖 Logged in as ${client.user.tag}`);
 });
 
+// === Randomized Greetings ===
 const greetings = {
-  en: ["hello", "hi", "hey", "good morning", "good afternoon"],
-  jp: ["konichiwa", "ohayou", "konbanwa", "moshi moshi"],
+  en: ["Hello!", "Hey there!", "Hi!", "Greetings!", "Howdy!"],
+  jp: ["こんにちは！", "やあ！", "もしもし！", "こんばんは！"],
 };
 
-const cooldowns = new Map(); // Menyimpan waktu terakhir user mengirim pesan
-const cooldownTime = 50000; // 5 detik cooldown per user
+const getRandomGreeting = (type) =>
+  greetings[type][Math.floor(Math.random() * greetings[type].length)];
+
+// === Anti-Spam System ===
+const userCooldowns = new Map();
+const cooldownTime = 5000; // 5 seconds
 
 client.on("messageCreate", async (message) => {
-  if (message.author.bot) return; // Hindari bot merespon pesan bot lain
+  if (message.author.bot) return;
 
-  const content = message.content.toLowerCase();
   const userId = message.author.id;
   const now = Date.now();
 
-  // Cek apakah user sedang dalam cooldown
-  if (cooldowns.has(userId)) {
-    const lastMessageTime = cooldowns.get(userId);
-    if (now - lastMessageTime < cooldownTime) {
-      return; // Jika masih dalam cooldown, bot tidak merespon
-    }
+  if (userCooldowns.has(userId) && now - userCooldowns.get(userId) < cooldownTime) {
+    return;
   }
+  userCooldowns.set(userId, now);
 
-  let reply = null;
-  if (greetings.en.includes(content)) {
-    reply = "Hello!";
-  } else if (greetings.jp.includes(content)) {
-    reply = "Konichiwa!";
-  }
-
-  if (reply) {
-    await message.reply(reply);
-    cooldowns.set(userId, now); // Simpan timestamp terakhir user mengirim sapaan
+  if (message.content.toLowerCase() === "hello") {
+    await message.reply(getRandomGreeting("en"));
+  } else if (message.content.toLowerCase() === "konichiwa" || message.content.toLowerCase() === "こんにちは") {
+    await message.reply(getRandomGreeting("jp"));
   }
 });
 
