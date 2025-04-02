@@ -143,9 +143,29 @@ const rest = new REST({ version: "10" }).setToken(TOKEN);
 
 // === Event Handling ===
 
+
+
 client.on("ready", () => {
   console.log(`🤖 Logged in as ${client.user.tag}`);
 });
+
+const greetings = {
+  en: ["hello", "hi", "hey", "good morning", "good afternoon"],
+  jp: ["konichiwa", "ohayou", "konbanwa", "moshi moshi"],
+};
+
+client.on("messageCreate", async (message) => {
+  if (message.author.bot) return; // Hindari bot merespon pesan bot lain
+
+  const content = message.content.toLowerCase();
+
+  if (greetings.en.includes(content)) {
+    await message.reply("Hello!");
+  } else if (greetings.jp.includes(content)) {
+    await message.reply("Konichiwa!");
+  }
+});
+
 
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isCommand()) return;
