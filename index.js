@@ -154,17 +154,37 @@ const greetings = {
   jp: ["konichiwa", "ohayou", "konbanwa", "moshi moshi"],
 };
 
+const cooldowns = new Map(); // Menyimpan waktu terakhir user mengirim pesan
+const cooldownTime = 50000; // 5 detik cooldown per user
+
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return; // Hindari bot merespon pesan bot lain
 
   const content = message.content.toLowerCase();
+  const userId = message.author.id;
+  const now = Date.now();
 
+  // Cek apakah user sedang dalam cooldown
+  if (cooldowns.has(userId)) {
+    const lastMessageTime = cooldowns.get(userId);
+    if (now - lastMessageTime < cooldownTime) {
+      return; // Jika masih dalam cooldown, bot tidak merespon
+    }
+  }
+
+  let reply = null;
   if (greetings.en.includes(content)) {
-    await message.reply("Hello!");
+    reply = "Hello!";
   } else if (greetings.jp.includes(content)) {
-    await message.reply("Konichiwa!");
+    reply = "Konichiwa!";
+  }
+
+  if (reply) {
+    await message.reply(reply);
+    cooldowns.set(userId, now); // Simpan timestamp terakhir user mengirim sapaan
   }
 });
+
 
 
 client.on("interactionCreate", async (interaction) => {
