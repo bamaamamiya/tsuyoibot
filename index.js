@@ -160,7 +160,7 @@ const getRandomGreeting = (type) =>
 
 // === Anti-Spam System ===
 const userCooldowns = new Map();
-const cooldownTime = 5000; // 5 seconds
+const cooldownTime = 50000; // 5 seconds
 
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
