@@ -30,10 +30,10 @@ const client = new Client({
 let challenge = {
   Daily: {
     theme: "Default Daily Theme",
-    vocab1: "語彙1",
-    vocab2: "語彙2",
-    vocab3: "語彙3",
-    example: "これは例文です。",
+    vocab1: "VOCAB1",
+    vocab2: "VOCAB2",
+    vocab3: "VOCAB3",
+    example: "Example senteces",
   },
   Weekly: {
     theme: "Default Weekly Theme",
