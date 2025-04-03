@@ -16,7 +16,6 @@ const jisho = require('@andymenderunix/jisho-js');
 
 dotenv.config();
 
-const jisho = new Jisho();
 
 const TOKEN = process.env.BOT_TOKEN;
 const CLIENT_ID = process.env.CLIENT_ID;
