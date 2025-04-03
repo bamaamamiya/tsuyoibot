@@ -10,12 +10,8 @@ const {
 } = require("discord.js");
 const dotenv = require("dotenv");
 const fs = require("fs");
-const { createCanvas, loadImage } = require('canvas');
-const jisho = require('@andymenderunix/jisho-js');
-
 
 dotenv.config();
-
 
 const TOKEN = process.env.BOT_TOKEN;
 const CLIENT_ID = process.env.CLIENT_ID;
@@ -153,51 +149,6 @@ client.on("ready", () => {
   console.log(`🤖 Logged in as ${client.user.tag}`);
 });
 
-client.on('messageCreate', async (message) => {
-  if (message.author.bot) return; // Mengabaikan pesan dari bot
-
-  if (message.content.startsWith('!furigana')) {
-    const text = message.content.slice(9).trim(); // Mengambil teks setelah !furigana
-    
-    if (!text) {
-      return message.reply('Please provide text in Japanese!');
-    }
-
-    try {
-      // Mengambil data dari Jisho API
-      const result = await jisho.search(text);
-
-      if (result.data.length === 0) {
-        return message.reply('Sorry, I couldn\'t find the kanji.');
-      }
-
-      const kanjiData = result.data[0];
-      const meanings = kanjiData.senses.map(sense => sense.english_definitions.join(', ')).join('\n');
-
-      // Membuat kanvas
-      const canvas = createCanvas(800, 400);
-      const ctx = canvas.getContext('2d');
-      ctx.font = '30px sans-serif';
-      ctx.fillStyle = 'black';
-
-      // Tulis teks asli
-      ctx.fillText('Original Text: ' + text, 20, 50);
-
-      // Tulis arti dan furigana (jika ada)
-      ctx.fillText('Meanings: ' + meanings, 20, 100);
-
-      // Mengonversi canvas menjadi gambar buffer dan mengirimkannya ke Discord
-      const attachment = canvas.toBuffer();
-      await message.reply({ files: [{ attachment, name: 'furigana-image.png' }] });
-
-    } catch (error) {
-      console.error(error);
-      message.reply('There was an error processing your request.');
-    }
-  }
-});
-
-// greatting
 const cooldowns = new Map(); // Untuk mencegah spam
 
 // Daftar sapaan dalam bahasa Inggris dan Jepang
