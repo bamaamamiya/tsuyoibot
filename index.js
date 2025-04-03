@@ -10,6 +10,8 @@ const {
 } = require("discord.js");
 const dotenv = require("dotenv");
 const fs = require("fs");
+const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus, VoiceConnectionStatus } = require('@discordjs/voice');
+const ytdl = require('ytdl-core');
 
 dotenv.config();
 
@@ -23,6 +25,7 @@ const client = new Client({
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
+		GatewayIntentBits.GuildVoiceStates
   ],
   partials: [Partials.Channel],
 });
@@ -149,6 +152,103 @@ client.on("ready", () => {
   console.log(`🤖 Logged in as ${client.user.tag}`);
 });
 
+// voice music
+client.on('messageCreate', async (message) => {
+  if (message.author.bot) return;
+
+  // Memeriksa apakah pesan dimulai dengan "t!"
+  if (!message.content.startsWith('t!')) return;
+
+  const args = message.content.slice(2).trim().split(' ');  // Memotong "t!" dan memisahkan argumen
+  const command = args.shift().toLowerCase();  // Mendapatkan command pertama setelah "t!"
+
+  // Command untuk join ke voice channel
+  if (command === 'join') {
+    if (!message.member.voice.channel) {
+      return message.reply('You need to join a voice channel first!');
+    }
+
+    try {
+      const connection = joinVoiceChannel({
+        channelId: message.member.voice.channel.id,
+        guildId: message.guild.id,
+        adapterCreator: message.guild.voiceAdapterCreator,
+      });
+
+      connection.on(VoiceConnectionStatus.Ready, () => {
+        console.log('The bot has connected to the voice channel!');
+      });
+
+      message.reply('I have joined your voice channel!');
+    } catch (error) {
+      console.error(error);
+      message.reply('There was an error joining the voice channel!');
+    }
+  }
+
+  // Command untuk memutar lagu dari YouTube
+  if (command === 'play' || command === 'p') {
+    const songUrl = args[0];
+    if (!songUrl) {
+      return message.reply('Please provide a YouTube link to play a song!');
+    }
+
+    if (!ytdl.validateURL(songUrl)) {
+      return message.reply('Invalid YouTube URL!');
+    }
+
+    if (!message.member.voice.channel) {
+      return message.reply('You need to join a voice channel first!');
+    }
+
+    try {
+      const connection = joinVoiceChannel({
+        channelId: message.member.voice.channel.id,
+        guildId: message.guild.id,
+        adapterCreator: message.guild.voiceAdapterCreator,
+      });
+
+      const stream = ytdl(songUrl, { filter: 'audioonly' });
+      const resource = createAudioResource(stream);
+      const player = createAudioPlayer();
+
+      player.play(resource);
+      connection.subscribe(player);
+
+      player.on(AudioPlayerStatus.Idle, () => {
+        connection.destroy(); // Disconnect after the song finishes
+        console.log('Song finished playing, disconnected from the voice channel.');
+      });
+
+      message.reply(`Now playing: ${songUrl}`);
+    } catch (error) {
+      console.error(error);
+      message.reply('There was an error playing the song!');
+    }
+  }
+
+  // Command untuk leave voice channel
+  if (command === 'leave') {
+    const connection = getVoiceConnection(message.guild.id);
+    if (connection) {
+      connection.destroy();
+      message.reply('I have left the voice channel!');
+    } else {
+      message.reply('I am not currently in a voice channel!');
+    }
+  }
+});
+
+
+
+
+
+
+
+
+
+
+// greatting
 const cooldowns = new Map(); // Untuk mencegah spam
 
 // Daftar sapaan dalam bahasa Inggris dan Jepang
