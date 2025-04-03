@@ -10,9 +10,6 @@ const {
 } = require("discord.js");
 const dotenv = require("dotenv");
 const fs = require("fs");
-const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus, AudioResource } = require('@discordjs/voice');
-const prism = require('prism-media');
-const ytdl = require('ytdl-core');
 
 dotenv.config();
 
@@ -26,7 +23,6 @@ const client = new Client({
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
-		GatewayIntentBits.GuildVoiceStates
   ],
   partials: [Partials.Channel],
 });
@@ -153,61 +149,6 @@ client.on("ready", () => {
   console.log(`🤖 Logged in as ${client.user.tag}`);
 });
 
-// voice music
-client.on('messageCreate', async (message) => {
-  if (message.content.startsWith('t!play') || message.content.startsWith('t!p')) {
-    const url = message.content.split(' ')[1];
-    if (!url) return message.reply('Please provide a YouTube URL.');
-
-    const voiceChannel = message.member?.voice.channel;
-    if (!voiceChannel) return message.reply('You need to join a voice channel first!');
-
-    try {
-      // Join the voice channel
-      const connection = joinVoiceChannel({
-        channelId: voiceChannel.id,
-        guildId: message.guild.id,
-        adapterCreator: message.guild.voiceAdapterCreator,
-      });
-
-      // Get the audio stream from the YouTube URL
-      const stream = ytdl(url, { filter: 'audioonly' });
-
-      // Convert stream to PCM and send to the voice channel
-      const audioResource = createAudioResource(
-        stream.pipe(new prism.opus.Decoder()),
-        { inputType: AudioResource.InputType.Stream }
-      );
-
-      const player = createAudioPlayer();
-      player.play(audioResource);
-
-      connection.subscribe(player);
-
-      player.on(AudioPlayerStatus.Idle, () => {
-        connection.destroy();
-      });
-
-      message.reply('Now playing!');
-    } catch (err) {
-      console.error(err);
-      message.reply('An error occurred while trying to play the audio.');
-    }
-  }
-
-  if (message.content === 't!leave') {
-    const voiceChannel = message.guild.members.me?.voice.channel;
-    if (voiceChannel) {
-      voiceChannel.disconnect();
-      message.reply('Disconnected from the voice channel!');
-    } else {
-      message.reply('I am not in a voice channel!');
-    }
-  }
-});
-
-
-// greatting
 const cooldowns = new Map(); // Untuk mencegah spam
 
 // Daftar sapaan dalam bahasa Inggris dan Jepang
@@ -218,38 +159,38 @@ const greetingsJP = ["こんにちは", "おはよう", "やあ", "もしもし"
 const responsesJP = ["こんにちは！🌸", "やあ！元気？", "おはよう！✨", "もしもし！📞"];
 
 // Fungsi untuk mendeteksi bahasa
-// function detectLanguage(message) {
-//     if (greetingsJP.some(greet => message.includes(greet))) return "JP";
-//     if (greetingsEN.some(greet => message.includes(greet))) return "EN";
-//     return null;
-// }
+function detectLanguage(message) {
+    if (greetingsJP.some(greet => message.includes(greet))) return "JP";
+    if (greetingsEN.some(greet => message.includes(greet))) return "EN";
+    return null;
+}
 
-// // Event ketika ada pesan masuk
-// client.on('messageCreate', (message) => {
-//     if (message.author.bot) return;
+// Event ketika ada pesan masuk
+client.on('messageCreate', (message) => {
+    if (message.author.bot) return;
 
-//     const userId = message.author.id;
-//     const now = Date.now();
+    const userId = message.author.id;
+    const now = Date.now();
 
-//     // Cek cooldown (3 detik)
-//     if (cooldowns.has(userId)) {
-//         const lastUsed = cooldowns.get(userId);
-//         if (now - lastUsed < 10000) return; // Jangan balas kalau masih dalam cooldown
-//     }
+    // Cek cooldown (3 detik)
+    if (cooldowns.has(userId)) {
+        const lastUsed = cooldowns.get(userId);
+        if (now - lastUsed < 10000) return; // Jangan balas kalau masih dalam cooldown
+    }
 
-//     const msg = message.content.toLowerCase();
-//     const lang = detectLanguage(msg);
+    const msg = message.content.toLowerCase();
+    const lang = detectLanguage(msg);
 
-//     if (lang === "JP") {
-//         const randomResponse = responsesJP[Math.floor(Math.random() * responsesJP.length)];
-//         message.reply(randomResponse);
-//         cooldowns.set(userId, now); // Set cooldown
-//     } else if (lang === "EN") {
-//         const randomResponse = responsesEN[Math.floor(Math.random() * responsesEN.length)];
-//         message.reply(randomResponse);
-//         cooldowns.set(userId, now); // Set cooldown
-//     }
-// });
+    if (lang === "JP") {
+        const randomResponse = responsesJP[Math.floor(Math.random() * responsesJP.length)];
+        message.reply(randomResponse);
+        cooldowns.set(userId, now); // Set cooldown
+    } else if (lang === "EN") {
+        const randomResponse = responsesEN[Math.floor(Math.random() * responsesEN.length)];
+        message.reply(randomResponse);
+        cooldowns.set(userId, now); // Set cooldown
+    }
+});
 
 
 
