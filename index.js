@@ -175,7 +175,7 @@ client.on('messageCreate', (message) => {
     // Cek cooldown (3 detik)
     if (cooldowns.has(userId)) {
         const lastUsed = cooldowns.get(userId);
-        if (now - lastUsed < 3000) return; // Jangan balas kalau masih dalam cooldown
+        if (now - lastUsed < 10000) return; // Jangan balas kalau masih dalam cooldown
     }
 
     const msg = message.content.toLowerCase();
