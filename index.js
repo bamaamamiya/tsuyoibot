@@ -149,36 +149,49 @@ client.on("ready", () => {
   console.log(`🤖 Logged in as ${client.user.tag}`);
 });
 
-// === Randomized Greetings ===
-const greetings = {
-  en: ["Hello!", "Hey there!", "Hi!", "Greetings!", "Howdy!"],
-  jp: ["こんにちは！", "やあ！", "もしもし！", "こんばんは！"],
-};
+const cooldowns = new Map(); // Untuk mencegah spam
 
-const getRandomGreeting = (type) =>
-  greetings[type][Math.floor(Math.random() * greetings[type].length)];
+// Daftar sapaan dalam bahasa Inggris dan Jepang
+const greetingsEN = ["hello", "hi", "hey", "yo", "sup"];
+const responsesEN = ["Hello there! 😊", "Hey! How’s your day going?", "Yo! Wassup?", "Hi! Hope you're doing great!"];
 
-// === Anti-Spam System ===
-const userCooldowns = new Map();
-const cooldownTime = 50000; // 5 seconds
+const greetingsJP = ["こんにちは", "おはよう", "やあ", "もしもし"];
+const responsesJP = ["こんにちは！🌸", "やあ！元気？", "おはよう！✨", "もしもし！📞"];
 
-client.on("messageCreate", async (message) => {
-  if (message.author.bot) return;
+// Fungsi untuk mendeteksi bahasa
+function detectLanguage(message) {
+    if (greetingsJP.some(greet => message.includes(greet))) return "JP";
+    if (greetingsEN.some(greet => message.includes(greet))) return "EN";
+    return null;
+}
 
-  const userId = message.author.id;
-  const now = Date.now();
+// Event ketika ada pesan masuk
+client.on('messageCreate', (message) => {
+    if (message.author.bot) return;
 
-  if (userCooldowns.has(userId) && now - userCooldowns.get(userId) < cooldownTime) {
-    return;
-  }
-  userCooldowns.set(userId, now);
+    const userId = message.author.id;
+    const now = Date.now();
 
-  if (message.content.toLowerCase() === "hello") {
-    await message.reply(getRandomGreeting("en"));
-  } else if (message.content.toLowerCase() === "konichiwa" || message.content.toLowerCase() === "こんにちは") {
-    await message.reply(getRandomGreeting("jp"));
-  }
+    // Cek cooldown (3 detik)
+    if (cooldowns.has(userId)) {
+        const lastUsed = cooldowns.get(userId);
+        if (now - lastUsed < 3000) return; // Jangan balas kalau masih dalam cooldown
+    }
+
+    const msg = message.content.toLowerCase();
+    const lang = detectLanguage(msg);
+
+    if (lang === "JP") {
+        const randomResponse = responsesJP[Math.floor(Math.random() * responsesJP.length)];
+        message.reply(randomResponse);
+        cooldowns.set(userId, now); // Set cooldown
+    } else if (lang === "EN") {
+        const randomResponse = responsesEN[Math.floor(Math.random() * responsesEN.length)];
+        message.reply(randomResponse);
+        cooldowns.set(userId, now); // Set cooldown
+    }
 });
+
 
 
 
