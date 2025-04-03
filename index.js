@@ -241,13 +241,6 @@ client.on('messageCreate', async (message) => {
 
 
 
-
-
-
-
-
-
-
 // greatting
 const cooldowns = new Map(); // Untuk mencegah spam
 
@@ -259,38 +252,38 @@ const greetingsJP = ["こんにちは", "おはよう", "やあ", "もしもし"
 const responsesJP = ["こんにちは！🌸", "やあ！元気？", "おはよう！✨", "もしもし！📞"];
 
 // Fungsi untuk mendeteksi bahasa
-function detectLanguage(message) {
-    if (greetingsJP.some(greet => message.includes(greet))) return "JP";
-    if (greetingsEN.some(greet => message.includes(greet))) return "EN";
-    return null;
-}
+// function detectLanguage(message) {
+//     if (greetingsJP.some(greet => message.includes(greet))) return "JP";
+//     if (greetingsEN.some(greet => message.includes(greet))) return "EN";
+//     return null;
+// }
 
-// Event ketika ada pesan masuk
-client.on('messageCreate', (message) => {
-    if (message.author.bot) return;
+// // Event ketika ada pesan masuk
+// client.on('messageCreate', (message) => {
+//     if (message.author.bot) return;
 
-    const userId = message.author.id;
-    const now = Date.now();
+//     const userId = message.author.id;
+//     const now = Date.now();
 
-    // Cek cooldown (3 detik)
-    if (cooldowns.has(userId)) {
-        const lastUsed = cooldowns.get(userId);
-        if (now - lastUsed < 10000) return; // Jangan balas kalau masih dalam cooldown
-    }
+//     // Cek cooldown (3 detik)
+//     if (cooldowns.has(userId)) {
+//         const lastUsed = cooldowns.get(userId);
+//         if (now - lastUsed < 10000) return; // Jangan balas kalau masih dalam cooldown
+//     }
 
-    const msg = message.content.toLowerCase();
-    const lang = detectLanguage(msg);
+//     const msg = message.content.toLowerCase();
+//     const lang = detectLanguage(msg);
 
-    if (lang === "JP") {
-        const randomResponse = responsesJP[Math.floor(Math.random() * responsesJP.length)];
-        message.reply(randomResponse);
-        cooldowns.set(userId, now); // Set cooldown
-    } else if (lang === "EN") {
-        const randomResponse = responsesEN[Math.floor(Math.random() * responsesEN.length)];
-        message.reply(randomResponse);
-        cooldowns.set(userId, now); // Set cooldown
-    }
-});
+//     if (lang === "JP") {
+//         const randomResponse = responsesJP[Math.floor(Math.random() * responsesJP.length)];
+//         message.reply(randomResponse);
+//         cooldowns.set(userId, now); // Set cooldown
+//     } else if (lang === "EN") {
+//         const randomResponse = responsesEN[Math.floor(Math.random() * responsesEN.length)];
+//         message.reply(randomResponse);
+//         cooldowns.set(userId, now); // Set cooldown
+//     }
+// });
 
 
 
