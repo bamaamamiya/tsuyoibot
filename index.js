@@ -160,8 +160,9 @@ const responsesJP = ["こんにちは！🌸", "やあ！元気？", "おはよ�
 
 // Fungsi untuk mendeteksi bahasa
 function detectLanguage(message) {
-    if (greetingsJP.some(greet => message.includes(greet))) return "JP";
-    if (greetingsEN.some(greet => message.includes(greet))) return "EN";
+	if (greetingsJP.some(greet => message.trim() === greet)) return "JP";
+	if (greetingsEN.some(greet => message.trim() === greet)) return "EN";
+	
     return null;
 }
 
