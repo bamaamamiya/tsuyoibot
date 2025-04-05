@@ -1,21 +1,10 @@
 const { SlashCommandBuilder, PermissionsBitField, EmbedBuilder } = require("discord.js");
 const CHANNEL_ID = process.env.CHANNEL_ID; // Tambahkan ini di .env jika belum
+const path = require("path");
+const challengePath = path.join(__dirname, "../data/challenges.js");
+let challenge = require(challengePath);
 
 
-const challenge = {
-  Daily: {
-    theme: "Daily Theme dari Admin",
-    vocab1: "単語1",
-    vocab2: "単語2",
-    vocab3: "単語3",
-    example: "Contoh kalimat dari admin.",
-  },
-  Weekly: {
-    theme: "Weekly Theme dari Admin",
-  },
-};
-
-module.exports = challenge;
 
 module.exports = {
   data: new SlashCommandBuilder()
