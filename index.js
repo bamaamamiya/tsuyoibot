@@ -475,7 +475,7 @@ client.on("interactionCreate", async (interaction) => {
         { name: "Katakana", value: randomKatakana.join(" "), inline: false }
       )
       .setTimestamp()
-      .setFooter({ text: "Keep learning every day okay 💪" });
+      .setFooter({ text: "Try Combine if you cannot just took 1 letter and typing word that you know,Keep learning every day okay 💪" });
 
     await interaction.reply({ embeds: [embed] });
   }
