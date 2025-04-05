@@ -468,14 +468,14 @@ client.on("interactionCreate", async (interaction) => {
     const randomKatakana = getRandomKana(katakana);
 
     const embed = new EmbedBuilder()
-      .setColor(0x00ae86)
-      .setTitle("🎌 Huruf Jepang Hari Ini")
+      .setColor(0x7d7270)
+      .setTitle("🎌 Japanese Letters Today")
       .addFields(
         { name: "Hiragana", value: randomHiragana.join(" "), inline: false },
         { name: "Katakana", value: randomKatakana.join(" "), inline: false }
       )
       .setTimestamp()
-      .setFooter({ text: "Belajar terus tiap hari ya 💪" });
+      .setFooter({ text: "Keep learning every day okay 💪" });
 
     await interaction.reply({ embeds: [embed] });
   }
