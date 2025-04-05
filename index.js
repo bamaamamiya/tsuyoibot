@@ -324,5 +324,90 @@ client.on("interactionCreate", async (interaction) => {
   }
 });
 
+// === Daily Kana Logic ===
+const kanaPairs = [
+  { kana: "あ", katakana: "ア" },
+  { kana: "い", katakana: "イ" },
+  { kana: "う", katakana: "ウ" },
+  { kana: "え", katakana: "エ" },
+  { kana: "お", katakana: "オ" },
+  { kana: "か", katakana: "カ" },
+  { kana: "き", katakana: "キ" },
+  { kana: "く", katakana: "ク" },
+  { kana: "け", katakana: "ケ" },
+  { kana: "こ", katakana: "コ" },
+  { kana: "さ", katakana: "サ" },
+  { kana: "し", katakana: "シ" },
+  { kana: "す", katakana: "ス" },
+  { kana: "せ", katakana: "セ" },
+  { kana: "そ", katakana: "ソ" },
+  // Tambah kalau perlu...
+];
+
+function xmur3(str) {
+  for (var i = 0, h = 1779033703 ^ str.length; i < str.length; i++)
+    h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+  h = (h << 13) | (h >>> 19);
+  return function () {
+    h = Math.imul(h ^ (h >>> 16), 2246822507);
+    h = Math.imul(h ^ (h >>> 13), 3266489909);
+    return (h ^= h >>> 16) >>> 0;
+  };
+}
+
+function sfc32(a, b, c, d) {
+  return function () {
+    a |= 0; b |= 0; c |= 0; d |= 0;
+    var t = (a + b) | 0;
+    a = b ^ (b >>> 9);
+    b = (c + (c << 3)) | 0;
+    c = (c << 21 | c >>> 11);
+    d = (d + 1) | 0;
+    t = (t + d) | 0;
+    c = (c + t) | 0;
+    return (t >>> 0) / 4294967296;
+  };
+}
+
+function getKanaLineForToday() {
+  const today = new Date().toISOString().split("T")[0];
+  const seed = xmur3(today);
+  const rand = sfc32(seed(), seed(), seed(), seed());
+
+  const useHiragana = rand() > 0.5;
+  const shuffled = [...kanaPairs];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+
+  const selected = shuffled.slice(0, 5);
+  const line = selected.map(k => useHiragana ? k.kana : k.katakana).join("・");
+
+  return {
+    line,
+    type: useHiragana ? "Hiragana" : "Katakana"
+  };
+}
+
+// === Export Slash Command
+module.exports = {
+  data: new SlashCommandBuilder()
+    .setName("dailykana")
+    .setDescription("Get 5 Random (hiragana/katakana) everyday!"),
+
+  async execute(interaction) {
+    const { line, type } = getKanaLineForToday();
+
+    const embed = new EmbedBuilder()
+      .setTitle("📖 Kana of the Day")
+      .setDescription(`**${line}**`)
+      .setColor(0xF67280)
+      .setFooter({ text: `Tipe: ${type} ・ ${new Date().toLocaleDateString("ja-JP")}` });
+
+    await interaction.reply({ embeds: [embed] });
+  }
+};
+
 client.on("error", console.error);
 client.login(TOKEN);
