@@ -1,5 +1,22 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
-const challenge = require("../data/challenges.json"); // atau path ke file yang menyimpan challenge-nya
+
+// config/challenges.js
+
+const challenges = {
+  Daily: {
+    theme: "Daily Theme dari Admin",
+    vocab1: "単語1",
+    vocab2: "単語2",
+    vocab3: "単語3",
+    example: "Contoh kalimat dari admin.",
+  },
+
+  Weekly: {
+    theme: "Weekly Theme dari Admin",
+  },
+};
+
+module.exports = challenges;
 
 module.exports = {
   data: new SlashCommandBuilder()
