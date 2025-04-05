@@ -1,4 +1,16 @@
 const fs = require("fs");
+const path = require("path");
+
+const challengeFilePath = path.join(__dirname, "challenge.json");
+let challengeData = {};
+
+// Saat bot pertama jalan, coba load file-nya
+if (fs.existsSync(challengeFilePath)) {
+  const fileData = fs.readFileSync(challengeFilePath, "utf8");
+  challengeData = JSON.parse(fileData);
+}
+
+
 
 let challenge = {
   Daily: {
@@ -22,4 +34,20 @@ function saveChallenges() {
   fs.writeFileSync("./challenges.json", JSON.stringify(challenge, null, 2));
 }
 
+if (commandName === updateChallengeCmd.name) {
+  const title = interaction.options.getString("title");
+  const description = interaction.options.getString("description");
+  const image = interaction.options.getString("image");
+
+  challengeData.title = title;
+  challengeData.description = description;
+  challengeData.image = image;
+
+  saveChallengeData(); // <- simpan ke file
+
+  await interaction.reply({
+    content: "✅ Challenge updated successfully!",
+    flags: 64,
+  });
+}
 module.exports = { challenge, saveChallenges };
