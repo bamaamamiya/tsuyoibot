@@ -474,9 +474,9 @@ client.on("interactionCreate", async (interaction) => {
         { name: "Hiragana", value: randomHiragana.join(" "), inline: false },
         { name: "Katakana", value: randomKatakana.join(" "), inline: false }
       )
-      .setTimestamp()	
+      .setTimestamp()
       .setDescription(
-        "**Tips:**\n<@&1352807726731759730tters if you can't guess just one.\nType what you already know.\nKeep learning every day 💪"
+        "**Tips:**\n<@&1352807726731759730>\nTry combining letters if you can't guess just one.\nType what you already know.\nKeep learning every day 💪"
       );
 
     await interaction.reply({ embeds: [embed] });
