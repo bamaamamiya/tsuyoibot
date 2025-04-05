@@ -10,6 +10,7 @@ const {
 } = require("discord.js");
 const dotenv = require("dotenv");
 const fs = require("fs");
+const cron = require("node-cron");
 
 dotenv.config();
 
@@ -33,7 +34,7 @@ let challenge = {
     vocab1: "VOCAB1",
     vocab2: "VOCAB2",
     vocab3: "VOCAB3",
-    example: "Example senteces",
+    example: "Example sentences",
   },
   Weekly: {
     theme: "Default Weekly Theme",
@@ -122,9 +123,31 @@ const sendChallengeCmd = new SlashCommandBuilder()
       .setRequired(false)
   );
 
-const commands = [updateChallengeCmd, viewChallengeCmd, sendChallengeCmd].map(
-  (cmd) => cmd.toJSON()
-);
+const sendKanaChallenge = new SlashCommandBuilder()
+  .setName("sendKanaChallege")
+  .setDescription("Send")
+  .addStringOption((option) =>
+    option
+      .setName("type")
+      .setRequired(true)
+      .addChoices(
+        { name: "hiragana", value: "hiragana" },
+        { name: "katakana", value: "katakana" }
+      )
+  )
+  .addChannelOption((option) =>
+    option
+      .setName("channel")
+      .setDescription("Channel to send the challenge to")
+      .setRequired(false)
+  );
+
+const commands = [
+  updateChallengeCmd,
+  viewChallengeCmd,
+  sendChallengeCmd,
+  sendKanaChallenge,
+].map((cmd) => cmd.toJSON());
 
 // === Register Commands ===
 const rest = new REST({ version: "10" }).setToken(TOKEN);
@@ -143,8 +166,6 @@ const rest = new REST({ version: "10" }).setToken(TOKEN);
 
 // === Event Handling ===
 
-
-
 client.on("ready", () => {
   console.log(`🤖 Logged in as ${client.user.tag}`);
 });
@@ -153,48 +174,57 @@ const cooldowns = new Map(); // Untuk mencegah spam
 
 // Daftar sapaan dalam bahasa Inggris dan Jepang
 const greetingsEN = ["hello", "hi", "hey", "yo", "sup"];
-const responsesEN = ["Hello there! 😊", "Hey! How’s your day going?", "Yo! Wassup?", "Hi! Hope you're doing great!"];
+const responsesEN = [
+  "Hello there! 😊",
+  "Hey! How’s your day going?",
+  "Yo! Wassup?",
+  "Hi! Hope you're doing great!",
+];
 
-const greetingsJP = ["こんにちは", "おはよう", "やあ", "もしもし","ohayou"];
-const responsesJP = ["こんにちは！🌸", "やあ！元気？", "おはよう！✨", "もしもし！📞"];
+const greetingsJP = ["こんにちは", "おはよう", "やあ", "もしもし", "ohayou"];
+const responsesJP = [
+  "こんにちは！🌸",
+  "やあ！元気？",
+  "おはよう！✨",
+  "もしもし！📞",
+];
 
 // Fungsi untuk mendeteksi bahasa
 function detectLanguage(message) {
-	if (greetingsJP.some(greet => message.trim() === greet)) return "JP";
-	if (greetingsEN.some(greet => message.trim() === greet)) return "EN";
-	
-    return null;
+  if (greetingsJP.some((greet) => message.trim() === greet)) return "JP";
+  if (greetingsEN.some((greet) => message.trim() === greet)) return "EN";
+
+  return null;
 }
 
 // Event ketika ada pesan masuk
-client.on('messageCreate', (message) => {
-    if (message.author.bot) return;
+client.on("messageCreate", (message) => {
+  if (message.author.bot) return;
 
-    const userId = message.author.id;
-    const now = Date.now();
+  const userId = message.author.id;
+  const now = Date.now();
 
-    // Cek cooldown (3 detik)
-    if (cooldowns.has(userId)) {
-        const lastUsed = cooldowns.get(userId);
-        if (now - lastUsed < 10000) return; // Jangan balas kalau masih dalam cooldown
-    }
+  // Cek cooldown (3 detik)
+  if (cooldowns.has(userId)) {
+    const lastUsed = cooldowns.get(userId);
+    if (now - lastUsed < 10000) return; // Jangan balas kalau masih dalam cooldown
+  }
 
-    const msg = message.content.toLowerCase();
-    const lang = detectLanguage(msg);
+  const msg = message.content.toLowerCase();
+  const lang = detectLanguage(msg);
 
-    if (lang === "JP") {
-        const randomResponse = responsesJP[Math.floor(Math.random() * responsesJP.length)];
-        message.reply(randomResponse);
-        cooldowns.set(userId, now); // Set cooldown
-    } else if (lang === "EN") {
-        const randomResponse = responsesEN[Math.floor(Math.random() * responsesEN.length)];
-        message.reply(randomResponse);
-        cooldowns.set(userId, now); // Set cooldown
-    }
+  if (lang === "JP") {
+    const randomResponse =
+      responsesJP[Math.floor(Math.random() * responsesJP.length)];
+    message.reply(randomResponse);
+    cooldowns.set(userId, now); // Set cooldown
+  } else if (lang === "EN") {
+    const randomResponse =
+      responsesEN[Math.floor(Math.random() * responsesEN.length)];
+    message.reply(randomResponse);
+    cooldowns.set(userId, now); // Set cooldown
+  }
 });
-
-
-
 
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isCommand()) return;
@@ -324,90 +354,197 @@ client.on("interactionCreate", async (interaction) => {
   }
 });
 
-// === Daily Kana Logic ===
-const kanaPairs = [
-  { kana: "あ", katakana: "ア" },
-  { kana: "い", katakana: "イ" },
-  { kana: "う", katakana: "ウ" },
-  { kana: "え", katakana: "エ" },
-  { kana: "お", katakana: "オ" },
-  { kana: "か", katakana: "カ" },
-  { kana: "き", katakana: "キ" },
-  { kana: "く", katakana: "ク" },
-  { kana: "け", katakana: "ケ" },
-  { kana: "こ", katakana: "コ" },
-  { kana: "さ", katakana: "サ" },
-  { kana: "し", katakana: "シ" },
-  { kana: "す", katakana: "ス" },
-  { kana: "せ", katakana: "セ" },
-  { kana: "そ", katakana: "ソ" },
-  // Tambah kalau perlu...
+// Hiragana and Katakana sets
+const hiragana = [
+  "あ",
+  "い",
+  "う",
+  "え",
+  "お",
+  "か",
+  "き",
+  "く",
+  "け",
+  "こ",
+  "さ",
+  "し",
+  "す",
+  "せ",
+  "そ",
+  "た",
+  "ち",
+  "つ",
+  "て",
+  "と",
+  "な",
+  "に",
+  "ぬ",
+  "ね",
+  "の",
+  "は",
+  "ひ",
+  "ふ",
+  "へ",
+  "ほ",
+  "ま",
+  "み",
+  "む",
+  "め",
+  "も",
+  "や",
+  "ゆ",
+  "よ",
+  "ら",
+  "り",
+  "る",
+  "れ",
+  "ろ",
+  "わ",
+  "を",
+  "ん",
 ];
 
-function xmur3(str) {
-  for (var i = 0, h = 1779033703 ^ str.length; i < str.length; i++)
-    h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
-  h = (h << 13) | (h >>> 19);
-  return function () {
-    h = Math.imul(h ^ (h >>> 16), 2246822507);
-    h = Math.imul(h ^ (h >>> 13), 3266489909);
-    return (h ^= h >>> 16) >>> 0;
-  };
+const katakana = [
+  "ア",
+  "イ",
+  "ウ",
+  "エ",
+  "オ",
+  "カ",
+  "キ",
+  "ク",
+  "ケ",
+  "コ",
+  "サ",
+  "シ",
+  "ス",
+  "セ",
+  "ソ",
+  "タ",
+  "チ",
+  "ツ",
+  "テ",
+  "ト",
+  "ナ",
+  "ニ",
+  "ヌ",
+  "ネ",
+  "ノ",
+  "ハ",
+  "ヒ",
+  "フ",
+  "ヘ",
+  "ホ",
+  "マ",
+  "ミ",
+  "ム",
+  "メ",
+  "モ",
+  "ヤ",
+  "ユ",
+  "ヨ",
+  "ラ",
+  "リ",
+  "ル",
+  "レ",
+  "ロ",
+  "ワ",
+  "ヲ",
+  "ン",
+];
+
+function getRandomKanaSet(set, count = 5) {
+  const result = [];
+  const copy = [...set];
+  for (let i = 0; i < count; i++) {
+    const idx = Math.floor(Math.random() * copy.length);
+    result.push(copy.splice(idx, 1)[0]);
+  }
+  return result.join(" ");
 }
 
-function sfc32(a, b, c, d) {
-  return function () {
-    a |= 0; b |= 0; c |= 0; d |= 0;
-    var t = (a + b) | 0;
-    a = b ^ (b >>> 9);
-    b = (c + (c << 3)) | 0;
-    c = (c << 21 | c >>> 11);
-    d = (d + 1) | 0;
-    t = (t + d) | 0;
-    c = (c + t) | 0;
-    return (t >>> 0) / 4294967296;
-  };
+let todayIsHiragana = true;
+
+function sendKanaChallenge(channel) {
+  const kanaType = todayIsHiragana ? "Hiragana" : "Katakana";
+  const kanaSet = todayIsHiragana ? hiragana : katakana;
+  const kana = getRandomKanaSet(kanaSet);
+  todayIsHiragana = !todayIsHiragana; // toggle for tomorrow
+  channel.send(`🎌 **${kanaType} Challenge Hari Ini!**\n${kana}`);
 }
 
-function getKanaLineForToday() {
-  const today = new Date().toISOString().split("T")[0];
-  const seed = xmur3(today);
-  const rand = sfc32(seed(), seed(), seed(), seed());
+// Schedule to run every 6 PM WIB (WIB = UTC+7 = 11:00 UTC)
+cron.schedule("0 11 * * *", async () => {
+  const channel = await client.channels.fetch(CHANNEL_ID);
+  if (channel) sendKanaChallenge(channel);
+});
 
-  const useHiragana = rand() > 0.5;
-  const shuffled = [...kanaPairs];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(rand() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+client.on("interactionCreate", async (interaction) => {
+  if (!interaction.isChatInputCommand()) return;
+  const { commandName, member, channel } = interaction;
+
+  if (commandName === "kana") {
+    const kanaType = todayIsHiragana ? "Hiragana" : "Katakana";
+    const kanaSet = todayIsHiragana ? hiragana : katakana;
+    const kana = getRandomKanaSet(kanaSet);
+    await interaction.reply(`🎌 **${kanaType} Challenge Hari Ini!**\n${kana}`);
   }
 
-  const selected = shuffled.slice(0, 5);
-  const line = selected.map(k => useHiragana ? k.kana : k.katakana).join("・");
+  if (commandName === "sendkana") {
+    if (!member.permissions.has("Administrator")) {
+      return await interaction.reply({
+        content: "❌ Only admins can use this command.",
+        ephemeral: true,
+      });
+    }
+    const kanaType = todayIsHiragana ? "Hiragana" : "Katakana";
+    const kanaSet = todayIsHiragana ? hiragana : katakana;
+    const kana = getRandomKanaSet(kanaSet);
+    todayIsHiragana = !todayIsHiragana;
+    await channel.send(
+      `🎌 **${kanaType} Challenge (Admin Triggered)**\n${kana}`
+    );
+    await interaction.reply({
+      content: "✅ Sent kana challenge to channel.",
+      ephemeral: true,
+    });
+  }
+});
 
-  return {
-    line,
-    type: useHiragana ? "Hiragana" : "Katakana"
-  };
+if (interaction.commandName === "sendKanaChallege") {
+  const type = interaction.options.getString("type");
+  const targetChannel = interaction.options.getChannel("channel");
+  const channel = targetChannel || client.channels.cache.get(CHANNEL_ID);
+
+  if (!channel || !channel.isTextBased()) {
+    await interaction.reply({
+      content: "⚠️ Channel not found or invalid!",
+      ephemeral: true,
+    });
+    return;
+  }
+
+  const kanaSet = type === "hiragana" ? hiragana : katakana;
+  const randomKana = kanaSet[Math.floor(Math.random() * kanaSet.length)];
+
+  const embed = new EmbedBuilder()
+    .setTitle(`🈴 Kana Challenge (${type})`)
+    .setDescription(`Write the **romaji** and **meaning** of: **${randomKana}**`)
+    .setColor(type === "hiragana" ? 0xff69b4 : 0xdda0dd)
+    .setTimestamp();
+
+  try {
+    await interaction.deferReply({ ephemeral: true });
+    await channel.send({ embeds: [embed] });
+    await interaction.editReply(`📢 Kana challenge sent to <#${channel.id}>!`);
+  } catch (error) {
+    console.error("❌ Error sending kana challenge:", error);
+    await interaction.editReply({
+      content: "⚠️ Failed to send kana challenge. Please check bot permissions!",
+    });
+  }
 }
 
-// === Export Slash Command
-module.exports = {
-  data: new SlashCommandBuilder()
-    .setName("dailykana")
-    .setDescription("Get 5 Random (hiragana/katakana) everyday!"),
-
-  async execute(interaction) {
-    const { line, type } = getKanaLineForToday();
-
-    const embed = new EmbedBuilder()
-      .setTitle("📖 Kana of the Day")
-      .setDescription(`**${line}**`)
-      .setColor(0xF67280)
-      .setFooter({ text: `Tipe: ${type} ・ ${new Date().toLocaleDateString("ja-JP")}` });
-
-    await interaction.reply({ embeds: [embed] });
-  }
-};
 
 client.on("error", console.error);
 client.login(TOKEN);
