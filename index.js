@@ -476,9 +476,8 @@ client.on("interactionCreate", async (interaction) => {
       )
       .setTimestamp()
 			.setDescription(
-				"**Tips:**\nTry combining letters if you can't guess just one.\nType what you already know.\nKeep learning every day 💪"
+				"**Tips:**\n\nTry combining letters if you can't guess just one.\nType what you already know.\nKeep learning every day 💪"
 			)
-      .setFooter({ text: "Try Combine if you cannot just took 1 letter and typing word that you know,Keep learning every day okay 💪" });
 
     await interaction.reply({ embeds: [embed] });
   }
