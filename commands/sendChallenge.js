@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, PermissionsBitField, EmbedBuilder } = require("discord.js");
 const challenge = require("../data/challenges.json"); // Ubah path jika perlu
-const CHANNEL_ID = process.env.DEFAULT_CHANNEL_ID; // Tambahkan ini di .env jika belum
+const CHANNEL_ID = process.env.CHANNEL_ID; // Tambahkan ini di .env jika belum
 
 module.exports = {
   data: new SlashCommandBuilder()
