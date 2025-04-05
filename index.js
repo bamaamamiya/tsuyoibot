@@ -7,9 +7,11 @@ const {
   SlashCommandBuilder,
   PermissionsBitField,
   EmbedBuilder,
+	Collection 
 } = require("discord.js");
 const dotenv = require("dotenv");
 const fs = require("fs");
+const path = require('path');
 const cron = require("node-cron");
 const grammarList = require("./data/n5GrammarList");
 const { getGrammarIndex, saveGrammarIndex } = require("./utils/grammarUtils"); // atau "./utils/grammarUtils"
@@ -31,6 +33,19 @@ const client = new Client({
   partials: [Partials.Channel],
 });
 
+client.commands = new Collection();
+const commandsPath = path.join(__dirname, 'commands');
+const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+
+for (const file of commandFiles) {
+  const filePath = path.join(commandsPath, file);
+  const command = require(filePath);
+  if ('data' in command && 'execute' in command) {
+    client.commands.set(command.data.name, command);
+  } else {
+    console.warn(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+  }
+}
 let challenge = {
   Daily: {
     theme: "Default Daily Theme",
@@ -43,11 +58,6 @@ let challenge = {
     theme: "Default Weekly Theme",
   },
 };
-
-if (fs.existsSync("./challenges.json")) {
-  const rawData = fs.readFileSync("./challenges.json");
-  challenge = JSON.parse(rawData);
-}
 
 // === Commands ===
 
@@ -134,6 +144,7 @@ const kanaCmd = new SlashCommandBuilder()
 const grammarCmd = new SlashCommandBuilder()
     .setName("grammar")
     .setDescription("Show today's Japanese grammar (N5 level)")
+
 const commands = [
   updateChallengeCmd,
   viewChallengeCmd,
@@ -248,6 +259,14 @@ client.on("interactionCreate", async (interaction) => {
   if (!interaction.isCommand()) return;
 
   const member = await interaction.guild.members.fetch(interaction.user.id);
+	const command = client.commands.get(interaction.commandName);
+	if (!command) return;
+	try {
+    await command.execute(interaction);
+  } catch (error) {
+    console.error(error);
+    await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+  }
 
   if (interaction.commandName === "update_challenge") {
     if (!member.permissions.has(PermissionsBitField.Flags.Administrator)) {
