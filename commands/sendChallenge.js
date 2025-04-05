@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, PermissionsBitField, EmbedBuilder } = require("discord.js");
 const CHANNEL_ID = process.env.CHANNEL_ID; // Tambahkan ini di .env jika belum
 const path = require("path");
-const challengePath = path.join(__dirname, "../data/challenges.js");
+const challengePath = path.join(__dirname, "../data/challenges.json");
 let challenge = require(challengePath);
 
 
