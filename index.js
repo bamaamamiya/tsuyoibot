@@ -103,7 +103,7 @@ const sendChallengeCmd = new SlashCommandBuilder()
   );
 
 const sendKanaChallenge = new SlashCommandBuilder()
-  .setName("sendKanaChallege")
+	.setName('sendKanaChallenge')
   .setDescription("Send Hiragana/Katakana Challenge")
   .addStringOption((option) =>
     option
