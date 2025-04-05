@@ -1,0 +1,172 @@
+[
+  {
+    "grammar": "です",
+    "explanation": "Copula (to be). Used to express identity or state.",
+    "examples": [
+      "これは本です。 (This is a book.)",
+      "私は学生です。 (I am a student.)"
+    ]
+  },
+  {
+    "grammar": "だ",
+    "explanation": "Informal version of です.",
+    "examples": [
+      "彼は学生だ。 (He is a student.)",
+      "これはペンだ。 (This is a pen.)"
+    ]
+  },
+  {
+    "grammar": "じゃない",
+    "explanation": "Negative form of です.",
+    "examples": [
+      "これは本じゃない。 (This is not a book.)",
+      "彼は先生じゃない。 (He is not a teacher.)"
+    ]
+  },
+  {
+    "grammar": "だった",
+    "explanation": "Past tense of だ.",
+    "examples": [
+      "彼は先生だった。 (He was a teacher.)",
+      "これは問題だった。 (This was a problem.)"
+    ]
+  },
+  {
+    "grammar": "じゃなかった",
+    "explanation": "Negative past form of です.",
+    "examples": [
+      "それは問題じゃなかった。 (That wasn't a problem.)",
+      "昨日は雨じゃなかった。 (It didn't rain yesterday.)"
+    ]
+  },
+  {
+    "grammar": "が",
+    "explanation": "Subject particle. Emphasizes what comes before it as the subject.",
+    "examples": [
+      "猫が好きです。 (I like cats.)",
+      "誰が来ましたか？ (Who came?)"
+    ]
+  },
+  {
+    "grammar": "は",
+    "explanation": "Topic particle. Indicates the topic of the sentence.",
+    "examples": [
+      "私は日本人です。 (I am Japanese.)",
+      "これはおいしいです。 (As for this, it is tasty.)"
+    ]
+  },
+  {
+    "grammar": "も",
+    "explanation": "Particle meaning 'also'.",
+    "examples": [
+      "彼も学生です。 (He is also a student.)",
+      "水もください。 (Water too, please.)"
+    ]
+  },
+  {
+    "grammar": "の",
+    "explanation": "Possessive or descriptive particle.",
+    "examples": [
+      "私の本です。 (This is my book.)",
+      "先生の車です。 (This is the teacher’s car.)"
+    ]
+  },
+  {
+    "grammar": "を",
+    "explanation": "Object particle. Marks the direct object of the action.",
+    "examples": [
+      "本を読みます。 (I read a book.)",
+      "水を飲みます。 (I drink water.)"
+    ]
+  },
+  {
+    "grammar": "に",
+    "explanation": "Indicates direction, destination, or point in time.",
+    "examples": [
+      "学校に行きます。 (I go to school.)",
+      "六時に起きます。 (I wake up at six.)"
+    ]
+  },
+  {
+    "grammar": "で",
+    "explanation": "Indicates the place of action or means.",
+    "examples": [
+      "図書館で勉強します。 (I study at the library.)",
+      "バスで行きます。 (I go by bus.)"
+    ]
+  },
+  {
+    "grammar": "から",
+    "explanation": "Indicates the starting point (from).",
+    "examples": [
+      "日本から来ました。 (I came from Japan.)",
+      "朝から晩まで働きます。 (I work from morning to night.)"
+    ]
+  },
+  {
+    "grammar": "まで",
+    "explanation": "Indicates limit (until, up to).",
+    "examples": [
+      "駅まで歩きます。 (I walk to the station.)",
+      "三時まで勉強します。 (I study until 3 o'clock.)"
+    ]
+  },
+  {
+    "grammar": "と",
+    "explanation": "Means 'and' or 'with'.",
+    "examples": [
+      "友達と話します。 (I talk with my friend.)",
+      "パンと牛乳を買いました。 (I bought bread and milk.)"
+    ]
+  },
+  {
+    "grammar": "や",
+    "explanation": "Means 'and' (non-exhaustive listing).",
+    "examples": [
+      "りんごやバナナを食べます。 (I eat things like apples and bananas.)"
+    ]
+  },
+  {
+    "grammar": "か",
+    "explanation": "Question marker or 'or'.",
+    "examples": [
+      "これは何ですか？ (What is this?)",
+      "水かお茶をください。 (Water or tea, please.)"
+    ]
+  },
+  {
+    "grammar": "も〜ない",
+    "explanation": "Negative emphasis meaning 'not even'.",
+    "examples": [
+      "誰も来ませんでした。 (No one came.)"
+    ]
+  },
+  {
+    "grammar": "まだ",
+    "explanation": "Means 'still' or 'not yet'.",
+    "examples": [
+      "まだ食べていません。 (I haven't eaten yet.)"
+    ]
+  },
+  {
+    "grammar": "もう",
+    "explanation": "Means 'already' or 'anymore'.",
+    "examples": [
+      "もう食べました。 (I already ate.)"
+    ]
+  },
+  {
+    "grammar": "だけ",
+    "explanation": "Means 'only'.",
+    "examples": [
+      "一人だけ来ました。 (Only one person came.)"
+    ]
+  },
+  {
+    "grammar": "しか〜ない",
+    "explanation": "Means 'nothing but' (used with negative).",
+    "examples": [
+      "これしかありません。 (There is only this.)"
+    ]
+  }
+]
