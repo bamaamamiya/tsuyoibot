@@ -14,7 +14,6 @@ const cron = require("node-cron");
 const grammarList = require("./data/n5GrammarList");
 const { getGrammarIndex, saveGrammarIndex } = require("./utils/grammarUtils"); // atau "./utils/grammarUtils"
 
-let grammarIndex = 0; // kamu juga bisa simpan ini ke file/database kalau mau persistent
 
 dotenv.config();
 
@@ -497,7 +496,7 @@ client.on("interactionCreate", async (interaction) => {
   }
 });
 
-cron.schedule("* * * * *", async () => {
+cron.schedule("* 13 * * *", async () => {
 	console.log("⏰ Running test grammar cron...");
 
   const channel = await client.channels.fetch(process.env.GRAMMAR_ID);
