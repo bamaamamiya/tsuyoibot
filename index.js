@@ -11,6 +11,10 @@ const {
 const dotenv = require("dotenv");
 const fs = require("fs");
 const cron = require("node-cron");
+const grammarList = require("./data/n5GrammarList");
+const { getGrammarIndex, saveGrammarIndex } = require("./utils/grammarUtils"); // atau "./utils/grammarUtils"
+
+let grammarIndex = 0; // kamu juga bisa simpan ini ke file/database kalau mau persistent
 
 dotenv.config();
 
@@ -127,11 +131,16 @@ const kanaCmd = new SlashCommandBuilder()
   .setName("kana")
   .setDescription("Send 5 Letters hiragana dan katakana");
 
+
+const grammarCmd = new SlashCommandBuilder()
+    .setName("grammar")
+    .setDescription("Show today's Japanese grammar (N5 level)")
 const commands = [
   updateChallengeCmd,
   viewChallengeCmd,
   sendChallengeCmd,
   kanaCmd,
+	grammarCmd,
 ].map((cmd) => cmd.toJSON());
 
 // === Register Commands ===
@@ -486,6 +495,34 @@ client.on("interactionCreate", async (interaction) => {
 
     await interaction.reply({ embeds: [embed] });
   }
+});
+
+cron.schedule("* * * * *", async () => {
+	console.log("⏰ Running test grammar cron...");
+
+  const channel = await client.channels.fetch(process.env.GRAMMAR_ID);
+  if (!channel) return;
+
+  const grammarIndex = getGrammarIndex();
+  const grammarItem = grammarList[grammarIndex];
+
+  const embed = new EmbedBuilder()
+    .setColor(0x3498db)
+    .setTitle("📚 Japanese Grammar of the Day – N5")
+    .addFields(
+      { name: "Grammar", value: `**${grammarItem.grammar}**`, inline: false },
+      { name: "Explanation", value: grammarItem.explanation, inline: false },
+      { name: "Examples", value: grammarItem.examples.join("\n"), inline: false },
+      { name: "Your Turn", value: "Try to make your own sentence using this grammar 👇", inline: false }
+    )
+    .setFooter({ text: "Daily Japanese | Keep learning one day at a time 💪" })
+    .setTimestamp();
+
+  channel.send({ embeds: [embed] });
+
+  // Simpan index baru
+  const nextIndex = (grammarIndex + 1) % grammarList.length;
+  saveGrammarIndex(nextIndex);
 });
 
 client.on("error", console.error);
