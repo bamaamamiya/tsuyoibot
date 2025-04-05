@@ -125,7 +125,7 @@ const sendChallengeCmd = new SlashCommandBuilder()
 
 const kanaCmd = new SlashCommandBuilder()
   .setName("kana")
-  .setDescription("Kirim 5 huruf hiragana dan katakana hari ini");
+  .setDescription("Send 5 Letters hiragana dan katakana");
 
 const commands = [
   updateChallengeCmd,
