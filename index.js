@@ -153,26 +153,31 @@ const rest = new REST({ version: "10" }).setToken(TOKEN);
 
 client.on("ready", () => {
   console.log(`🤖 Logged in as ${client.user.tag}`);
+	
+	
   // Cron: setiap hari jam 9 pagi
-  cron.schedule("0 9 * * *", async () => {
-    const channel = await client.channels.fetch(CHANNEL_ID);
-    if (!channel) return;
-
-    const randomHiragana = getRandomKana(hiragana);
-    const randomKatakana = getRandomKana(katakana);
-
-    const embed = new EmbedBuilder()
-      .setColor(0x00ae86)
-      .setTitle("🎌 Huruf Jepang Hari Ini")
-      .addFields(
-        { name: "Hiragana", value: randomHiragana.join(" "), inline: false },
-        { name: "Katakana", value: randomKatakana.join(" "), inline: false }
-      )
-      .setTimestamp()
-      .setFooter({ text: "Belajar terus tiap hari ya 💪" });
-
-    channel.send({ embeds: [embed] });
-  });
+  cron.schedule("0 13 * * *", async () => {
+	const channel = await client.channels.fetch(process.env.KANA_CHANNEL_ID);
+		if (!channel) return;
+	
+		const randomHiragana = getRandomKana(hiragana);
+		const randomKatakana = getRandomKana(katakana);
+	
+		const embed = new EmbedBuilder()
+			.setColor(0x7d7270)
+			.setTitle("🎌 Japanese Letters Today")
+			.addFields(
+				{ name: "Hiragana", value: randomHiragana.join(" "), inline: false },
+				{ name: "Katakana", value: randomKatakana.join(" "), inline: false }
+			)
+			.setTimestamp()
+			.setDescription(
+				"**Tips:**\n<@&1352807726731759730>\nTry combining letters if you can't guess just one.\nType what you already know.\nKeep learning every day 💪"
+			);
+	
+		channel.send({ embeds: [embed] });
+	});
+	
 });
 
 const cooldowns = new Map(); // Untuk mencegah spam
