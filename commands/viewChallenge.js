@@ -2,7 +2,7 @@ const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 
 // config/challenges.js
 
-const challenges = {
+const challenge = {
   Daily: {
     theme: "Daily Theme dari Admin",
     vocab1: "単語1",
@@ -16,7 +16,7 @@ const challenges = {
   },
 };
 
-module.exports = challenges;
+module.exports = challenge;
 
 module.exports = {
   data: new SlashCommandBuilder()

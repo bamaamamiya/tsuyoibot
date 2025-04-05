@@ -10,12 +10,14 @@ const challenge = {
     vocab3: "単語3",
     example: "Contoh kalimat dari admin.",
   },
+
   Weekly: {
     theme: "Weekly Theme dari Admin",
   },
 };
 
 module.exports = challenge;
+
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("send_challenge")
