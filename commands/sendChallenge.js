@@ -1,11 +1,6 @@
 const { SlashCommandBuilder, PermissionsBitField, EmbedBuilder } = require("discord.js");
 const CHANNEL_ID = process.env.CHANNEL_ID; // Tambahkan ini di .env jika belum
 
-const fs = require("fs");
-const path = require("path");
-
-const draftPath = path.join(__dirname, "../data/challenges_draft.json");
-const activePath = path.join(__dirname, "../data/challenges.json");
 
 const challenge = {
   Daily: {
@@ -15,7 +10,6 @@ const challenge = {
     vocab3: "単語3",
     example: "Contoh kalimat dari admin.",
   },
-
   Weekly: {
     theme: "Weekly Theme dari Admin",
   },
@@ -26,29 +20,36 @@ module.exports = challenge;
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("send_challenge")
-    .setDescription("Publish the draft challenge (Admins only)")
+    .setDescription("Send the daily or weekly vocab challenge to a specific channel")
     .addStringOption(option =>
-      option.setName("type").setDescription("Challenge type").setRequired(true)
+      option.setName("type")
+        .setDescription("Challenge type")
+        .setRequired(true)
         .addChoices(
-          { name: "Daily", value: "Daily" },
-          { name: "Weekly", value: "Weekly" }
+          { name: "Weekly", value: "Weekly" },
+          { name: "Daily", value: "Daily" }
         )
-    ).addChannelOption(option =>
+    )
+    .addChannelOption(option =>
       option.setName("channel")
         .setDescription("Channel to send the challenge (optional)")
         .setRequired(false)
     ),
 
-		async execute(interaction) {
-			if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
-				return interaction.reply({ content: "❌ Admins only!", ephemeral: true });
-			}
+  async execute(interaction) {
+    const member = interaction.member;
+
+    if (!member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+      await interaction.reply({
+        content: "❌ Only admins can send the challenge.",
+        ephemeral: true,
+      });
+      return;
+    }
 
     const type = interaction.options.getString("type");
     const targetChannel = interaction.options.getChannel("channel");
     const channel = targetChannel || interaction.client.channels.cache.get(CHANNEL_ID);
-    const draft = require(draftPath);
-    const current = require(activePath);
 
     console.log(
       `🔎 Selected Channel: ${targetChannel ? targetChannel.id : "None"}, Fallback: ${CHANNEL_ID}`
@@ -70,8 +71,8 @@ module.exports = {
       return;
     }
 
-		current[type] = draft[type];
-    fs.writeFileSync(activePath, JSON.stringify(current, null, 2));
+    const current = challenge[type];
+
     try {
       await interaction.deferReply({ ephemeral: true });
 
@@ -93,10 +94,7 @@ module.exports = {
 
       await channel.send({ embeds: [embed] });
 
-      await interaction.reply({
-				content: `✅ ${type} challenge has been published from draft!`,
-				ephemeral: true,
-			});
+      await interaction.editReply(`📢 ${type} Challenge sent to <#${channel.id}>!`);
     } catch (error) {
       console.error("❌ Error sending message:", error);
       await interaction.editReply({
