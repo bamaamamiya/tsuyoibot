@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, PermissionsBitField } = require("discord.js");
 const fs = require("fs");
 const path = require("path");
-const challengePath = path.join(__dirname, "../data/challenges.json"); // Ubah sesuai lokasi file
+const challengePath = path.join(__dirname, "../data/challenges.js"); // Ubah sesuai lokasi file
 const challenge = require(challengePath);
 
 module.exports = {
