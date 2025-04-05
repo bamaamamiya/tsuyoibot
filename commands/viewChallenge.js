@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
-
+const fs = require("fs/promises");
+const path = require("path");
 // config/challenges.js
 
 module.exports = {
@@ -19,6 +20,12 @@ module.exports = {
 
   async execute(interaction) {
     const type = interaction.options.getString("type");
+
+    const data = await fs.readFile(
+      path.join(__dirname, "../data/challenges.json"),
+      "utf8"
+    );
+    const challenge = JSON.parse(data);
     const current = challenge[type];
 
     const embed = new EmbedBuilder()
