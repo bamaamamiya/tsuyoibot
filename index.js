@@ -10,7 +10,6 @@ const {
 } = require("discord.js");
 const dotenv = require("dotenv");
 const fs = require("fs");
-const cron = require("node-cron");
 
 dotenv.config();
 
@@ -34,7 +33,7 @@ let challenge = {
     vocab1: "VOCAB1",
     vocab2: "VOCAB2",
     vocab3: "VOCAB3",
-    example: "Example sentences",
+    example: "Example senteces",
   },
   Weekly: {
     theme: "Default Weekly Theme",
@@ -45,6 +44,8 @@ if (fs.existsSync("./challenges.json")) {
   const rawData = fs.readFileSync("./challenges.json");
   challenge = JSON.parse(rawData);
 }
+
+// === Commands ===
 
 const updateChallengeCmd = new SlashCommandBuilder()
   .setName("update_challenge")
@@ -63,16 +64,28 @@ const updateChallengeCmd = new SlashCommandBuilder()
     option.setName("theme").setDescription("Challenge theme").setRequired(true)
   )
   .addStringOption((option) =>
-    option.setName("vocab1").setDescription("Vocab 1 (Daily Only)")
+    option
+      .setName("vocab1")
+      .setDescription("Vocab 1 (Daily Only)")
+      .setRequired(false)
   )
   .addStringOption((option) =>
-    option.setName("vocab2").setDescription("Vocab 2 (Daily Only)")
+    option
+      .setName("vocab2")
+      .setDescription("Vocab 2 (Daily Only)")
+      .setRequired(false)
   )
   .addStringOption((option) =>
-    option.setName("vocab3").setDescription("Vocab 3 (Daily Only)")
+    option
+      .setName("vocab3")
+      .setDescription("Vocab 3 (Daily Only)")
+      .setRequired(false)
   )
   .addStringOption((option) =>
-    option.setName("example").setDescription("Example sentence (Daily Only)")
+    option
+      .setName("example")
+      .setDescription("Example sentence (Daily Only)")
+      .setRequired(false)
   );
 
 const viewChallengeCmd = new SlashCommandBuilder()
@@ -93,39 +106,29 @@ const sendChallengeCmd = new SlashCommandBuilder()
   .setName("send_challenge")
   .setDescription("Send current challenge to the channel")
   .addStringOption((option) =>
-    option.setName("type").setRequired(true).addChoices(
-      { name: "Weekly", value: "Weekly" },
-      { name: "Daily", value: "Daily" }
-    )
-  )
-  .addChannelOption((option) =>
-    option.setName("channel").setDescription("Target channel")
-  );
-
-const sendKanaChallenge = new SlashCommandBuilder()
-	.setName('sendKanaChallenge')
-  .setDescription("Send Hiragana/Katakana Challenge")
-  .addStringOption((option) =>
     option
       .setName("type")
+      .setDescription("Challenge type")
       .setRequired(true)
       .addChoices(
-        { name: "hiragana", value: "hiragana" },
-        { name: "katakana", value: "katakana" }
+        { name: "Weekly", value: "Weekly" },
+        { name: "Daily", value: "Daily" }
       )
   )
   .addChannelOption((option) =>
-    option.setName("channel").setDescription("Target channel")
+    option
+      .setName("channel")
+      .setDescription("Channel to send the challenge to")
+      .setRequired(false)
   );
 
-const commands = [
-  updateChallengeCmd,
-  viewChallengeCmd,
-  sendChallengeCmd,
-  sendKanaChallenge,
-].map((cmd) => cmd.toJSON());
+const commands = [updateChallengeCmd, viewChallengeCmd, sendChallengeCmd].map(
+  (cmd) => cmd.toJSON()
+);
 
+// === Register Commands ===
 const rest = new REST({ version: "10" }).setToken(TOKEN);
+
 (async () => {
   try {
     console.log("🔄 Registering slash commands...");
@@ -138,59 +141,60 @@ const rest = new REST({ version: "10" }).setToken(TOKEN);
   }
 })();
 
-client.once("ready", () => {
+// === Event Handling ===
+
+
+
+client.on("ready", () => {
   console.log(`🤖 Logged in as ${client.user.tag}`);
 });
 
+const cooldowns = new Map(); // Untuk mencegah spam
+
+// Daftar sapaan dalam bahasa Inggris dan Jepang
 const greetingsEN = ["hello", "hi", "hey", "yo", "sup"];
-const responsesEN = [
-  "Hello there! 😊",
-  "Hey! How’s your day going?",
-  "Yo! Wassup?",
-  "Hi! Hope you're doing great!",
-];
+const responsesEN = ["Hello there! 😊", "Hey! How’s your day going?", "Yo! Wassup?", "Hi! Hope you're doing great!"];
 
-const greetingsJP = ["こんにちは", "おはよう", "やあ", "もしもし", "ohayou"];
-const responsesJP = [
-  "こんにちは！🌸",
-  "やあ！元気？",
-  "おはよう！✨",
-  "もしもし！📞",
-];
+const greetingsJP = ["こんにちは", "おはよう", "やあ", "もしもし","ohayou"];
+const responsesJP = ["こんにちは！🌸", "やあ！元気？", "おはよう！✨", "もしもし！📞"];
 
+// Fungsi untuk mendeteksi bahasa
 function detectLanguage(message) {
-  if (greetingsJP.some((greet) => message.trim() === greet)) return "JP";
-  if (greetingsEN.some((greet) => message.trim() === greet)) return "EN";
-  return null;
+	if (greetingsJP.some(greet => message.trim() === greet)) return "JP";
+	if (greetingsEN.some(greet => message.trim() === greet)) return "EN";
+	
+    return null;
 }
 
-const cooldowns = new Map();
+// Event ketika ada pesan masuk
+client.on('messageCreate', (message) => {
+    if (message.author.bot) return;
 
-client.on("messageCreate", (message) => {
-  if (message.author.bot) return;
+    const userId = message.author.id;
+    const now = Date.now();
 
-  const userId = message.author.id;
-  const now = Date.now();
+    // Cek cooldown (3 detik)
+    if (cooldowns.has(userId)) {
+        const lastUsed = cooldowns.get(userId);
+        if (now - lastUsed < 10000) return; // Jangan balas kalau masih dalam cooldown
+    }
 
-  if (cooldowns.has(userId)) {
-    if (now - cooldowns.get(userId) < 10000) return;
-  }
+    const msg = message.content.toLowerCase();
+    const lang = detectLanguage(msg);
 
-  const msg = message.content.toLowerCase();
-  const lang = detectLanguage(msg);
-
-  if (lang === "JP") {
-    const randomResponse =
-      responsesJP[Math.floor(Math.random() * responsesJP.length)];
-    message.reply(randomResponse);
-    cooldowns.set(userId, now);
-  } else if (lang === "EN") {
-    const randomResponse =
-      responsesEN[Math.floor(Math.random() * responsesEN.length)];
-    message.reply(randomResponse);
-    cooldowns.set(userId, now);
-  }
+    if (lang === "JP") {
+        const randomResponse = responsesJP[Math.floor(Math.random() * responsesJP.length)];
+        message.reply(randomResponse);
+        cooldowns.set(userId, now); // Set cooldown
+    } else if (lang === "EN") {
+        const randomResponse = responsesEN[Math.floor(Math.random() * responsesEN.length)];
+        message.reply(randomResponse);
+        cooldowns.set(userId, now); // Set cooldown
+    }
 });
+
+
+
 
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isCommand()) return;
@@ -199,10 +203,11 @@ client.on("interactionCreate", async (interaction) => {
 
   if (interaction.commandName === "update_challenge") {
     if (!member.permissions.has(PermissionsBitField.Flags.Administrator)) {
-      return interaction.reply({
+      await interaction.reply({
         content: "Only admins can update the challenge.",
         ephemeral: true,
       });
+      return;
     }
 
     const type = interaction.options.getString("type");
@@ -220,7 +225,9 @@ client.on("interactionCreate", async (interaction) => {
     }
 
     fs.writeFileSync("./challenges.json", JSON.stringify(challenge, null, 2));
-    await interaction.reply(`✅ ${type} Challenge updated!`);
+    await interaction.reply(
+      `✅ ${type} Challenge updated! Theme: ${challenge[type].theme}`
+    );
   }
 
   if (interaction.commandName === "view_challenge") {
@@ -230,63 +237,92 @@ client.on("interactionCreate", async (interaction) => {
     const embed = new EmbedBuilder()
       .setTitle(`📌 ${type} Vocab Challenge`)
       .addFields(
-        { name: "📚 Theme", value: current.theme },
+        { name: "📚 Theme", value: current.theme, inline: false },
         ...(type === "Daily"
           ? [
-              { name: "1️⃣ Vocab 1", value: current.vocab1 },
-              { name: "2️⃣ Vocab 2", value: current.vocab2 },
-              { name: "3️⃣ Vocab 3", value: current.vocab3 },
-              { name: "📝 Example", value: current.example },
+              { name: "1️⃣ Vocab 1", value: current.vocab1, inline: true },
+              { name: "2️⃣ Vocab 2", value: current.vocab2, inline: true },
+              { name: "3️⃣ Vocab 3", value: current.vocab3, inline: true },
+              { name: "📝 Example", value: current.example, inline: false },
             ]
           : [])
       )
-      .setColor(type === "Daily" ? 0x00bfff : 0xffa500);
+      .setColor(type === "Daily" ? 0x00bfff : 0xffa500)
+      .setTimestamp();
 
     await interaction.reply({ embeds: [embed], ephemeral: true });
   }
 
   if (interaction.commandName === "send_challenge") {
     if (!member.permissions.has(PermissionsBitField.Flags.Administrator)) {
-      return interaction.reply({
+      await interaction.reply({
         content: "Only admins can send the challenge.",
         ephemeral: true,
       });
+      return;
     }
 
     const type = interaction.options.getString("type");
-    const channel =
-      interaction.options.getChannel("channel") ||
-      client.channels.cache.get(CHANNEL_ID);
+    const targetChannel = interaction.options.getChannel("channel"); // Get selected channel
+    const channel = targetChannel || client.channels.cache.get(CHANNEL_ID); // Use selected or fallback
 
-    if (!channel || !channel.isTextBased()) {
-      return interaction.reply({
-        content: "⚠️ Channel not found or invalid!",
+    console.log(
+      `🔎 Selected Channel: ${
+        targetChannel ? targetChannel.id : "None"
+      }, Fallback: ${CHANNEL_ID}`
+    );
+
+    // Validasi tipe challenge
+    if (!challenge[type]) {
+      await interaction.reply({
+        content: "⚠️ Invalid challenge type!",
         ephemeral: true,
       });
+      return;
     }
 
     const current = challenge[type];
-    const embed = new EmbedBuilder()
-      .setTitle(`📌 ${type} Vocab Challenge`)
-      .addFields(
-        { name: "📚 Theme", value: current.theme },
-        ...(type === "Daily"
-          ? [
-              { name: "1️⃣ Vocab 1", value: current.vocab1 },
-              { name: "2️⃣ Vocab 2", value: current.vocab2 },
-              { name: "3️⃣ Vocab 3", value: current.vocab3 },
-              { name: "📝 Example", value: current.example },
-            ]
-          : [])
-      )
-      .setColor(type === "Daily" ? 0x00bfff : 0xffa500);
 
-    await channel.send({ embeds: [embed] });
-    await interaction.reply({
-      content: `📢 ${type} Challenge sent to <#${channel.id}>!`,
-      ephemeral: true,
-    });
+    if (!channel || !channel.isTextBased()) {
+      await interaction.reply({
+        content: "⚠️ Channel not found or invalid!",
+        ephemeral: true,
+      });
+      return;
+    }
+
+    try {
+      await interaction.deferReply({ ephemeral: true }); // Menghindari timeout jika proses lama
+
+      const embed = new EmbedBuilder()
+        .setTitle(`📌 ${type} Vocab Challenge`)
+        .addFields(
+          { name: "📚 Theme", value: current.theme, inline: false },
+          ...(type === "Daily"
+            ? [
+                { name: "1️⃣ Vocab 1", value: current.vocab1, inline: true },
+                { name: "2️⃣ Vocab 2", value: current.vocab2, inline: true },
+                { name: "3️⃣ Vocab 3", value: current.vocab3, inline: true },
+                { name: "📝 Example", value: current.example, inline: false },
+              ]
+            : [])
+        )
+        .setColor(type === "Daily" ? 0x00bfff : 0xffa500)
+        .setTimestamp();
+
+      await channel.send({ embeds: [embed] }); // Mengirim pesan ke channel
+
+      await interaction.editReply(
+        `📢 ${type} Challenge sent to <#${channel.id}>!`
+      );
+    } catch (error) {
+      console.error("❌ Error sending message:", error);
+      await interaction.editReply({
+        content: "⚠️ Failed to send message. Please check bot permissions!",
+      });
+    }
   }
 });
 
+client.on("error", console.error);
 client.login(TOKEN);
