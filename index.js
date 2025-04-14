@@ -40,51 +40,51 @@ client.once("ready", () => {
 });
 
 // === Greeting Auto-Reply ===
-const cooldowns = new Map();
-const greetingsEN = ["hello", "hi", "hey", "yo", "sup"];
-const responsesEN = [
-  "Hello there! 😊",
-  "Hey! How’s your day going?",
-  "Yo! Wassup?",
-  "Hi! Hope you're doing great!",
-];
-const greetingsJP = ["こんにちは", "おはよう", "やあ", "もしもし", "ohayou"];
-const responsesJP = [
-  "こんにちは！🌸",
-  "やあ！元気？",
-  "おはよう！✨",
-  "もしもし！📞",
-];
+// const cooldowns = new Map();
+// const greetingsEN = ["hello", "hi", "hey", "yo", "sup"];
+// const responsesEN = [
+//   "Hello there! 😊",
+//   "Hey! How’s your day going?",
+//   "Yo! Wassup?",
+//   "Hi! Hope you're doing great!",
+// ];
+// const greetingsJP = ["こんにちは", "おはよう", "やあ", "もしもし", "ohayou"];
+// const responsesJP = [
+//   "こんにちは！🌸",
+//   "やあ！元気？",
+//   "おはよう！✨",
+//   "もしもし！📞",
+// ];
 
-function detectLanguage(message) {
-  if (greetingsJP.some((greet) => message.trim() === greet)) return "JP";
-  if (greetingsEN.some((greet) => message.trim() === greet)) return "EN";
-  return null;
-}
+// function detectLanguage(message) {
+//   if (greetingsJP.some((greet) => message.trim() === greet)) return "JP";
+//   if (greetingsEN.some((greet) => message.trim() === greet)) return "EN";
+//   return null;
+// }
 
-client.on("messageCreate", (message) => {
-  if (message.author.bot) return;
+// client.on("messageCreate", (message) => {
+//   if (message.author.bot) return;
 
-  const userId = message.author.id;
-  const now = Date.now();
-  if (cooldowns.has(userId)) {
-    const lastUsed = cooldowns.get(userId);
-    if (now - lastUsed < 10000) return;
-  }
+//   const userId = message.author.id;
+//   const now = Date.now();
+//   if (cooldowns.has(userId)) {
+//     const lastUsed = cooldowns.get(userId);
+//     if (now - lastUsed < 10000) return;
+//   }
 
-  const msg = message.content.toLowerCase();
-  const lang = detectLanguage(msg);
+//   const msg = message.content.toLowerCase();
+//   const lang = detectLanguage(msg);
 
-  if (lang === "JP") {
-    const randomResponse = responsesJP[Math.floor(Math.random() * responsesJP.length)];
-    message.reply(randomResponse);
-    cooldowns.set(userId, now);
-  } else if (lang === "EN") {
-    const randomResponse = responsesEN[Math.floor(Math.random() * responsesEN.length)];
-    message.reply(randomResponse);
-    cooldowns.set(userId, now);
-  }
-});
+//   if (lang === "JP") {
+//     const randomResponse = responsesJP[Math.floor(Math.random() * responsesJP.length)];
+//     message.reply(randomResponse);
+//     cooldowns.set(userId, now);
+//   } else if (lang === "EN") {
+//     const randomResponse = responsesEN[Math.floor(Math.random() * responsesEN.length)];
+//     message.reply(randomResponse);
+//     cooldowns.set(userId, now);
+//   }
+// });
 
 // === Handle Slash Command ===
 client.on("interactionCreate", async (interaction) => {
