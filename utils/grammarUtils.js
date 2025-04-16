@@ -1,19 +1,26 @@
 const fs = require("fs");
 const path = require("path");
 
-const indexPath = path.join(__dirname, "./utils/grammarIndex.json");
-
 function getGrammarIndex() {
-  if (!fs.existsSync(indexPath)) {
-    fs.writeFileSync(indexPath, JSON.stringify({ index: 0 }, null, 2));
+  try {
+    const data = fs.readFileSync(path.join(__dirname, "grammarIndex.json"));
+    const parsed = JSON.parse(data);
+    return parsed.index;
+  } catch (err) {
+    console.error("Error reading grammar index:", err);
     return 0;
   }
-  const data = JSON.parse(fs.readFileSync(indexPath));
-  return data.index;
 }
 
 function saveGrammarIndex(index) {
-  fs.writeFileSync(indexPath, JSON.stringify({ index }, null, 2));
+  try {
+    fs.writeFileSync(
+      path.join(__dirname, "grammarIndex.json"),
+      JSON.stringify({ index })
+    );
+  } catch (err) {
+    console.error("Error saving grammar index:", err);
+  }
 }
 
 module.exports = { getGrammarIndex, saveGrammarIndex };
