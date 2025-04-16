@@ -3,7 +3,7 @@ const path = require("path");
 
 function getGrammarIndex() {
   try {
-    const data = fs.readFileSync(path.join(__dirname, "grammarIndexUlti.json"));
+    const data = fs.readFileSync(path.join(__dirname, "grammarListUlti.json"));
     const parsed = JSON.parse(data);
     return parsed.index;
   } catch (err) {
