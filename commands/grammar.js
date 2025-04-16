@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
-const grammarList = require("../data/grammarListUlti.json");
+const grammarList = require("../data/grammarList.json");
 const { getGrammarIndex, saveGrammarIndex } = require("../utils/grammarUtils");
 
 module.exports = {
