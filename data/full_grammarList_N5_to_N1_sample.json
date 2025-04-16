@@ -1,0 +1,88 @@
+[
+  {
+    "grammar": "です",
+    "level": "N5",
+    "explanation": "Copula (to be). Used to express identity or state.",
+    "examples": [
+      "これは本です。 (This is a book.)",
+      "私は学生です。 (I am a student.)"
+    ]
+  },
+  {
+    "grammar": "が",
+    "level": "N5",
+    "explanation": "Subject particle. Emphasizes what comes before it as the subject.",
+    "examples": [
+      "猫が好きです。 (I like cats.)",
+      "誰が来ましたか？ (Who came?)"
+    ]
+  },
+  {
+    "grammar": "〜ようになる",
+    "level": "N4",
+    "explanation": "Indicates a change in ability or habit.",
+    "examples": [
+      "日本語が話せるようになりました。 (I became able to speak Japanese.)",
+      "毎朝早く起きるようになった。 (I started waking up early every morning.)"
+    ]
+  },
+  {
+    "grammar": "〜つもり",
+    "level": "N4",
+    "explanation": "Indicates intention or plan to do something.",
+    "examples": [
+      "明日、旅行に行くつもりです。 (I plan to go on a trip tomorrow.)",
+      "来年、日本で勉強するつもりだ。 (I intend to study in Japan next year.)"
+    ]
+  },
+  {
+    "grammar": "〜うちに",
+    "level": "N3",
+    "explanation": "While a condition holds / before something happens.",
+    "examples": [
+      "明るいうちに帰ってきてね。 (Come back while it’s still light.)",
+      "雨が降らないうちに帰りましょう。 (Let’s go home before it starts raining.)"
+    ]
+  },
+  {
+    "grammar": "〜ようとする",
+    "level": "N3",
+    "explanation": "To try to, to attempt to do something.",
+    "examples": [
+      "寝ようとした時に電話が鳴った。 (Just as I was about to sleep, the phone rang.)",
+      "彼は逃げようとした。 (He tried to escape.)"
+    ]
+  },
+  {
+    "grammar": "〜わけではない",
+    "level": "N2",
+    "explanation": "It's not that..., doesn't mean that...",
+    "examples": [
+      "お金がないわけではないが、今は使いたくない。 (It's not that I don't have money, I just don't want to spend it now.)"
+    ]
+  },
+  {
+    "grammar": "〜に違いない",
+    "level": "N2",
+    "explanation": "Must be..., I’m sure that...",
+    "examples": [
+      "彼は犯人に違いない。 (He must be the culprit.)"
+    ]
+  },
+  {
+    "grammar": "〜に至るまで",
+    "level": "N1",
+    "explanation": "Even to, all the way to... (used to emphasize extent).",
+    "examples": [
+      "髪の毛一本に至るまで、完璧に再現されていた。 (Even down to a single strand of hair, it was perfectly reproduced.)"
+    ]
+  },
+  {
+    "grammar": "〜かたわら",
+    "level": "N1",
+    "explanation": "While also doing..., in addition to... (used in formal writing).",
+    "examples": [
+      "彼は教師の仕事をするかたわら、小説を書いている。 (He writes novels in addition to working as a teacher.)"
+    ]
+  }
+]

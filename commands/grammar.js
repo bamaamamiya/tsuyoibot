@@ -1,21 +1,23 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-
-// Import grammar list & helpers
-const grammarList = require("../data/grammarList.json"); // sesuaikan path
-const { getGrammarIndex, saveGrammarIndex } = require("../utils/grammarUtils"); // helper untuk tracking index
+const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
+const grammarList = require("../data/grammarList.json");
+const { getGrammarIndex, saveGrammarIndex } = require("../utils/grammarUtils");
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("grammar")
-    .setDescription("Show the Japanese Grammar of the Day (N5)"),
-    
+    .setDescription("Show the Japanese Grammar of the Day")
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator), // hanya admin
+
   async execute(interaction) {
     const grammarIndex = getGrammarIndex();
     const grammarItem = grammarList[grammarIndex];
 
+    // Gunakan level dari data
+    const level = grammarItem.level || "N5"; // fallback ke N5 kalau belum ada
+
     const embed = new EmbedBuilder()
       .setColor(0x3498db)
-      .setTitle("📚 Japanese Grammar of the Day – N5")
+      .setTitle(`📚 Japanese Grammar of the Day – ${level}`)
       .addFields(
         { name: "Grammar", value: `**${grammarItem.grammar}**`, inline: false },
         { name: "Explanation", value: grammarItem.explanation, inline: false },
@@ -27,7 +29,7 @@ module.exports = {
 
     await interaction.reply({ embeds: [embed] });
 
-    // Update index (optional — bisa diaktifkan jika kamu ingin next grammar tiap command)
+    // Save next index
     const nextIndex = (grammarIndex + 1) % grammarList.length;
     saveGrammarIndex(nextIndex);
   },

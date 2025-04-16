@@ -5,8 +5,7 @@
     "examples": [
       "これは本です。 (This is a book.)",
       "私は学生です。 (I am a student.)"
-    ],
-    "level": "N5"
+    ]
   },
   {
     "grammar": "だ",
@@ -14,8 +13,7 @@
     "examples": [
       "彼は学生だ。 (He is a student.)",
       "これはペンだ。 (This is a pen.)"
-    ],
-    "level": "N5"
+    ]
   },
   {
     "grammar": "じゃない",
@@ -23,8 +21,7 @@
     "examples": [
       "これは本じゃない。 (This is not a book.)",
       "彼は先生じゃない。 (He is not a teacher.)"
-    ],
-    "level": "N5"
+    ]
   },
   {
     "grammar": "だった",
@@ -32,8 +29,7 @@
     "examples": [
       "彼は先生だった。 (He was a teacher.)",
       "これは問題だった。 (This was a problem.)"
-    ],
-    "level": "N5"
+    ]
   },
   {
     "grammar": "じゃなかった",
@@ -41,8 +37,7 @@
     "examples": [
       "それは問題じゃなかった。 (That wasn't a problem.)",
       "昨日は雨じゃなかった。 (It didn't rain yesterday.)"
-    ],
-    "level": "N5"
+    ]
   },
   {
     "grammar": "が",
@@ -50,8 +45,7 @@
     "examples": [
       "猫が好きです。 (I like cats.)",
       "誰が来ましたか？ (Who came?)"
-    ],
-    "level": "N5"
+    ]
   },
   {
     "grammar": "は",
@@ -59,8 +53,7 @@
     "examples": [
       "私は日本人です。 (I am Japanese.)",
       "これはおいしいです。 (As for this, it is tasty.)"
-    ],
-    "level": "N5"
+    ]
   },
   {
     "grammar": "も",
@@ -68,8 +61,7 @@
     "examples": [
       "彼も学生です。 (He is also a student.)",
       "水もください。 (Water too, please.)"
-    ],
-    "level": "N5"
+    ]
   },
   {
     "grammar": "の",
@@ -77,8 +69,7 @@
     "examples": [
       "私の本です。 (This is my book.)",
       "先生の車です。 (This is the teacher’s car.)"
-    ],
-    "level": "N5"
+    ]
   },
   {
     "grammar": "を",
@@ -86,8 +77,7 @@
     "examples": [
       "本を読みます。 (I read a book.)",
       "水を飲みます。 (I drink water.)"
-    ],
-    "level": "N5"
+    ]
   },
   {
     "grammar": "に",
@@ -95,8 +85,7 @@
     "examples": [
       "学校に行きます。 (I go to school.)",
       "六時に起きます。 (I wake up at six.)"
-    ],
-    "level": "N5"
+    ]
   },
   {
     "grammar": "で",
@@ -104,8 +93,7 @@
     "examples": [
       "図書館で勉強します。 (I study at the library.)",
       "バスで行きます。 (I go by bus.)"
-    ],
-    "level": "N5"
+    ]
   },
   {
     "grammar": "から",
@@ -113,8 +101,7 @@
     "examples": [
       "日本から来ました。 (I came from Japan.)",
       "朝から晩まで働きます。 (I work from morning to night.)"
-    ],
-    "level": "N5"
+    ]
   },
   {
     "grammar": "まで",
@@ -122,8 +109,7 @@
     "examples": [
       "駅まで歩きます。 (I walk to the station.)",
       "三時まで勉強します。 (I study until 3 o'clock.)"
-    ],
-    "level": "N5"
+    ]
   },
   {
     "grammar": "と",
@@ -131,16 +117,14 @@
     "examples": [
       "友達と話します。 (I talk with my friend.)",
       "パンと牛乳を買いました。 (I bought bread and milk.)"
-    ],
-    "level": "N5"
+    ]
   },
   {
     "grammar": "や",
     "explanation": "Means 'and' (non-exhaustive listing).",
     "examples": [
       "りんごやバナナを食べます。 (I eat things like apples and bananas.)"
-    ],
-    "level": "N5"
+    ]
   },
   {
     "grammar": "か",
@@ -148,47 +132,41 @@
     "examples": [
       "これは何ですか？ (What is this?)",
       "水かお茶をください。 (Water or tea, please.)"
-    ],
-    "level": "N5"
+    ]
   },
   {
     "grammar": "も〜ない",
     "explanation": "Negative emphasis meaning 'not even'.",
     "examples": [
       "誰も来ませんでした。 (No one came.)"
-    ],
-    "level": "N5"
+    ]
   },
   {
     "grammar": "まだ",
     "explanation": "Means 'still' or 'not yet'.",
     "examples": [
       "まだ食べていません。 (I haven't eaten yet.)"
-    ],
-    "level": "N5"
+    ]
   },
   {
     "grammar": "もう",
     "explanation": "Means 'already' or 'anymore'.",
     "examples": [
       "もう食べました。 (I already ate.)"
-    ],
-    "level": "N5"
+    ]
   },
   {
     "grammar": "だけ",
     "explanation": "Means 'only'.",
     "examples": [
       "一人だけ来ました。 (Only one person came.)"
-    ],
-    "level": "N5"
+    ]
   },
   {
     "grammar": "しか〜ない",
     "explanation": "Means 'nothing but' (used with negative).",
     "examples": [
       "これしかありません。 (There is only this.)"
-    ],
-    "level": "N5"
+    ]
   }
 ]
