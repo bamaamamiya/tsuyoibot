@@ -190,5 +190,218 @@
       "これしかありません。 (There is only this.)"
     ],
     "level": "N5"
+  },
+	{
+    "grammar": "～たい",
+    "explanation": "Indicates desire to do something (want to).",
+    "examples": [
+      "日本へ行きたいです。 (I want to go to Japan.)",
+      "水を飲みたいです。 (I want to drink water.)"
+    ],
+    "level": "N5"
+  },
+  {
+    "grammar": "～たことがある",
+    "explanation": "Used to express past experiences (have done).",
+    "examples": [
+      "日本に行ったことがあります。 (I have been to Japan.)",
+      "すしを食べたことがあります。 (I have eaten sushi.)"
+    ],
+    "level": "N5"
+  },
+  {
+    "grammar": "～ている",
+    "explanation": "Indicates an ongoing action or current state.",
+    "examples": [
+      "今、勉強しています。 (I am studying now.)",
+      "彼は学生です。 (He is a student.)"
+    ],
+    "level": "N5"
+  },
+  {
+    "grammar": "～てください",
+    "explanation": "Polite request form (please do).",
+    "examples": [
+      "ドアを開けてください。 (Please open the door.)",
+      "待ってください。 (Please wait.)"
+    ],
+    "level": "N5"
+  },
+  {
+    "grammar": "～てもいい",
+    "explanation": "Asking for or giving permission (is it okay if... / you may...).",
+    "examples": [
+      "ここで写真を撮ってもいいですか？ (Is it okay to take a photo here?)",
+      "入ってもいいです。 (You may come in.)"
+    ],
+    "level": "N5"
+  },
+  {
+    "grammar": "～てはいけない",
+    "explanation": "Prohibition (must not).",
+    "examples": [
+      "ここでタバコを吸ってはいけません。 (You must not smoke here.)",
+      "それをしてはいけません。 (You must not do that.)"
+    ],
+    "level": "N5"
+  },
+  {
+    "grammar": "～ながら",
+    "explanation": "While doing something (simultaneous actions).",
+    "examples": [
+      "音楽を聞きながら勉強します。 (I study while listening to music.)"
+    ],
+    "level": "N5"
+  },
+  {
+    "grammar": "～たり～たりする",
+    "explanation": "Listing representative actions (do things like A and B).",
+    "examples": [
+      "本を読んだり、音楽を聞いたりします。 (I read books and listen to music, among other things.)"
+    ],
+    "level": "N5"
+  },
+  {
+    "grammar": "～くなる / ～になる",
+    "explanation": "To become (used with adjectives and nouns).",
+    "examples": [
+      "寒くなりました。 (It became cold.)",
+      "先生になりたいです。 (I want to become a teacher.)"
+    ],
+    "level": "N5"
+  },
+  {
+    "grammar": "～ないでください",
+    "explanation": "Polite request to not do something.",
+    "examples": [
+      "ここで写真を撮らないでください。 (Please don’t take pictures here.)",
+      "走らないでください。 (Please don’t run.)"
+    ],
+    "level": "N5"
+  },
+  {
+    "grammar": "～ましょう / ～ましょうか",
+    "explanation": "Let’s do... / Shall we... (making suggestions or offers).",
+    "examples": [
+      "行きましょう。 (Let’s go.)",
+      "手伝いましょうか？ (Shall I help?)"
+    ],
+    "level": "N5"
+  },
+  {
+    "grammar": "～つもりです",
+    "explanation": "Indicates intention or plan.",
+    "examples": [
+      "明日、映画を見るつもりです。 (I plan to watch a movie tomorrow.)"
+    ],
+    "level": "N5"
+  },
+  {
+    "grammar": "～ほうがいい",
+    "explanation": "Giving advice or recommendation (it’s better to...).",
+    "examples": [
+      "薬を飲んだほうがいいです。 (You should take medicine.)"
+    ],
+    "level": "N5"
+  },
+  {
+    "grammar": "～ことができる",
+    "explanation": "Can do something (ability).",
+    "examples": [
+      "日本語を話すことができます。 (I can speak Japanese.)"
+    ],
+    "level": "N5"
+  },
+  {
+    "grammar": "～前に / ～後で",
+    "explanation": "Before / After doing something.",
+    "examples": [
+      "寝る前に本を読みます。 (I read a book before sleeping.)",
+      "食べた後で、勉強します。 (I study after eating.)"
+    ],
+    "level": "N5"
+  },
+	{
+    "grammar": "〜ている",
+    "explanation": "Used to express an ongoing action or a continuing state.",
+    "examples": [
+      "今、勉強しています。 (I am studying now.)",
+      "結婚しています。 (I am married.)"
+    ],
+    "level": "N5"
+  },
+  {
+    "grammar": "〜てから",
+    "explanation": "Used to indicate that one action happens after another.",
+    "examples": [
+      "ご飯を食べてから、勉強します。 (I will study after eating.)"
+    ],
+    "level": "N5"
+  },
+  {
+    "grammar": "〜ながら",
+    "explanation": "Used to show two actions happening at the same time.",
+    "examples": [
+      "音楽を聞きながら勉強します。 (I study while listening to music.)"
+    ],
+    "level": "N5"
+  },
+  {
+    "grammar": "〜と思う",
+    "explanation": "Used to express thoughts or opinions.",
+    "examples": [
+      "いい映画だと思います。 (I think it’s a good movie.)",
+      "彼は来ると思います。 (I think he will come.)"
+    ],
+    "level": "N5"
+  },
+  {
+    "grammar": "〜と言う",
+    "explanation": "Used to quote or report what someone said.",
+    "examples": [
+      "先生は「静かにしてください」と言いました。 (The teacher said, 'Please be quiet.')"
+    ],
+    "level": "N5"
+  },
+  {
+    "grammar": "〜より〜のほうが",
+    "explanation": "Used for comparisons to show preference.",
+    "examples": [
+      "犬より猫のほうが好きです。 (I like cats more than dogs.)"
+    ],
+    "level": "N5"
+  },
+  {
+    "grammar": "〜の中で一番〜",
+    "explanation": "Used to express the best or most among a group.",
+    "examples": [
+      "この中で、誰が一番背が高いですか？ (Who is the tallest among them?)"
+    ],
+    "level": "N5"
+  },
+  {
+    "grammar": "〜つもり",
+    "explanation": "Used to indicate intention or plan.",
+    "examples": [
+      "日本へ行くつもりです。 (I plan to go to Japan.)"
+    ],
+    "level": "N5"
+  },
+  {
+    "grammar": "〜ほうがいい",
+    "explanation": "Used to give advice or suggestion.",
+    "examples": [
+      "早く寝たほうがいいですよ。 (You should go to bed early.)"
+    ],
+    "level": "N5"
+  },
+  {
+    "grammar": "〜でしょう / だろう",
+    "explanation": "Used to express probability or guess.",
+    "examples": [
+      "明日は雨が降るでしょう。 (It will probably rain tomorrow.)",
+      "彼は来るだろう。 (He will probably come.)"
+    ],
+    "level": "N5"
   }
 ]
