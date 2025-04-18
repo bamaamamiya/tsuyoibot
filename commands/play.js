@@ -23,10 +23,10 @@ module.exports = {
   async execute(interaction) {
     const url = interaction.options.getString("url");
 
-    // Deferring reply to avoid interaction acknowledgment error
+    // Defer reply di awal
     await interaction.deferReply();
 
-    // Make sure user is in a voice channel
+    // Pastikan user di voice channel
     const member = await interaction.guild.members.fetch(interaction.user.id);
     const voiceChannel = member.voice.channel;
 
@@ -37,7 +37,7 @@ module.exports = {
       });
     }
 
-    // Validate YouTube URL
+    // Validasi YouTube URL
     if (!play.yt_validate(url)) {
       return interaction.editReply({
         content: "❌ Invalid YouTube URL.",
@@ -77,7 +77,7 @@ module.exports = {
         }
       });
 
-      // Send confirmation after starting the music
+      // Setelah audio dimainkan, beri respon dengan editReply
       await interaction.editReply({
         content: `🎶 Now playing: ${url}`,
       });
