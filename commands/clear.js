@@ -1,10 +1,9 @@
-const { SlashCommandBuilder } = require("discord.js");
+const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("clear")
     .setDescription("Delete a specific number of messages.")
-    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator) // hanya admin
     .addIntegerOption((option) =>
       option
         .setName("amount")
@@ -21,6 +20,18 @@ module.exports = {
   async execute(interaction) {
     const amount = interaction.options.getInteger("amount");
     const targetUser = interaction.options.getUser("target");
+
+    // ❗ CEK: Hanya owner atau admin yang bisa pakai
+    const member = interaction.member;
+    const isOwner = interaction.guild.ownerId === interaction.user.id;
+    const isAdmin = member.permissions.has(PermissionFlagsBits.Administrator);
+
+    if (!isOwner && !isAdmin) {
+      return interaction.reply({
+        content: "❌ You need to be the server owner or have Administrator permissions to use this command.",
+        ephemeral: true,
+      });
+    }
 
     if (amount < 1 || amount > 100) {
       return interaction.reply({
