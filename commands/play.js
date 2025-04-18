@@ -33,7 +33,7 @@ module.exports = {
     if (!voiceChannel) {
       return interaction.editReply({
         content: "❌ You need to join a voice channel first!",
-        ephemeral: true,
+        flags: 64, // Flag untuk menjadikan pesan hanya bisa dilihat oleh pengirim
       });
     }
 
@@ -41,13 +41,14 @@ module.exports = {
     if (!ytdl.validateURL(url)) {
       return interaction.editReply({
         content: "❌ Invalid YouTube URL.",
-        ephemeral: true,
+        flags: 64, // Flag untuk menjadikan pesan hanya bisa dilihat oleh pengirim
       });
     }
 
     try {
       // Mendapatkan stream audio dari URL YouTube
-      const stream = ytdl(url, { filter: "audioonly" });
+      const stream = ytdl(url, { filter: "audioonly", quality: "highestaudio" });
+
       const resource = createAudioResource(stream, {
         inputType: "opus", // Menentukan jenis input audio (opus untuk audio YouTube)
       });
@@ -83,6 +84,7 @@ module.exports = {
       console.error("Error playing audio:", err);
       await interaction.editReply({
         content: "❌ Failed to play the audio. Check the URL or try again.",
+        flags: 64, // Flag untuk menjadikan pesan hanya bisa dilihat oleh pengirim
       });
     }
   },
