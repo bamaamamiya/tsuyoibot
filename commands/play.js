@@ -47,30 +47,42 @@ module.exports = {
 
     try {
       // Mendapatkan stream audio dari URL YouTube
-      const stream = ytdl(url, { filter: "audioonly", quality: "highestaudio" });
-
-      const resource = createAudioResource(stream, {
-        inputType: "opus", // Menentukan jenis input audio (opus untuk audio YouTube)
+      const stream = ytdl(url, {
+        filter: "audioonly",
+        quality: "highestaudio",
       });
 
+      const resource = createAudioResource(stream, {
+        inputType: AudioInputType.Opus, // Menentukan jenis input audio (opus untuk audio YouTube)
+      });
+      console.log("Audio Resource Created:", resource);
+
       const player = createAudioPlayer();
+      player.play(resource);
+      console.log("Audio player started");
 
       const connection = joinVoiceChannel({
         channelId: voiceChannel.id,
         guildId: voiceChannel.guild.id,
         adapterCreator: voiceChannel.guild.voiceAdapterCreator,
       });
+      console.log("Bot connected to voice channel.");
 
       connection.subscribe(player);
       player.play(resource);
 
       player.on(AudioPlayerStatus.Idle, () => {
+        console.log("Player has finished playing, destroying connection.");
         connection.destroy();
+      });
+
+      connection.on(VoiceConnectionStatus.Ready, () => {
+        console.log("Voice connection is ready.");
       });
 
       connection.on(VoiceConnectionStatus.Disconnected, async () => {
         try {
-          await entersState(connection, VoiceConnectionStatus.Ready, 5_000);
+          await entersState(connection, VoiceConnectionStatus.Ready, 5_000),  console.log("Voice connection was disconnected.");					;
         } catch {
           connection.destroy();
         }
