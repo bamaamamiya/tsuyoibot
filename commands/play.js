@@ -23,26 +23,27 @@ module.exports = {
   async execute(interaction) {
     const url = interaction.options.getString("url");
 
-    // Pastikan user di voice channel
+    // Deferring reply to avoid interaction acknowledgment error
+    await interaction.deferReply();
+
+    // Make sure user is in a voice channel
     const member = await interaction.guild.members.fetch(interaction.user.id);
     const voiceChannel = member.voice.channel;
 
     if (!voiceChannel) {
-      return interaction.reply({
+      return interaction.editReply({
         content: "❌ You need to join a voice channel first!",
         ephemeral: true,
       });
     }
 
-    // Cek apakah URL valid
+    // Validate YouTube URL
     if (!play.yt_validate(url)) {
-      return interaction.reply({
+      return interaction.editReply({
         content: "❌ Invalid YouTube URL.",
         ephemeral: true,
       });
     }
-
-    await interaction.deferReply();
 
     try {
       const { stream, format } = await play.stream(url);
@@ -76,6 +77,7 @@ module.exports = {
         }
       });
 
+      // Send confirmation after starting the music
       await interaction.editReply({
         content: `🎶 Now playing: ${url}`,
       });
