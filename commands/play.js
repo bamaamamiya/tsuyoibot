@@ -1,5 +1,12 @@
 const { SlashCommandBuilder } = require("discord.js");
-const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus, entersState, VoiceConnectionStatus } = require("@discordjs/voice");
+const {
+  joinVoiceChannel,
+  createAudioPlayer,
+  createAudioResource,
+  AudioPlayerStatus,
+  entersState,
+  VoiceConnectionStatus,
+} = require("@discordjs/voice");
 const play = require("play-dl");
 
 module.exports = {
@@ -38,7 +45,9 @@ module.exports = {
     await interaction.deferReply();
 
     try {
-      const stream = await play.stream(url);
+      const { stream, format } = await play.stream(url);
+      console.log("Stream fetched:", stream);
+      console.log("Format:", format);
 
       const resource = createAudioResource(stream.stream, {
         inputType: stream.type,
@@ -51,7 +60,7 @@ module.exports = {
         guildId: voiceChannel.guild.id,
         adapterCreator: voiceChannel.guild.voiceAdapterCreator,
       });
-			
+
       connection.subscribe(player);
       player.play(resource);
 
@@ -69,7 +78,6 @@ module.exports = {
 
       await interaction.editReply({
         content: `🎶 Now playing: ${url}`,
-				
       });
     } catch (err) {
       console.error("Error playing audio:", err);
