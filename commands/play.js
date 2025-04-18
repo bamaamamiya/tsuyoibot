@@ -1,13 +1,7 @@
 const { SlashCommandBuilder } = require("discord.js");
-const {
-  joinVoiceChannel,
-  createAudioPlayer,
-  createAudioResource,
-  AudioPlayerStatus,
-  entersState,
-  VoiceConnectionStatus,
-} = require("@discordjs/voice");
-const ytdl = require("ytdl-core");
+const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus, VoiceConnectionStatus, entersState } = require('@discordjs/voice');
+const play = require("play-dl"); // play-dl library to fetch streams
+const ytdl = require('ytdl-core'); // ytdl-core for YouTube video fetching
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -23,81 +17,110 @@ module.exports = {
   async execute(interaction) {
     const url = interaction.options.getString("url");
 
-    // Defer reply di awal
-    await interaction.deferReply();
+    // Log the URL received
+    console.log("URL received:", url);
 
-    // Pastikan user di voice channel
+    // Ensure user is in a voice channel
     const member = await interaction.guild.members.fetch(interaction.user.id);
     const voiceChannel = member.voice.channel;
 
     if (!voiceChannel) {
-      return interaction.editReply({
+      return interaction.reply({
         content: "❌ You need to join a voice channel first!",
-        flags: 64, // Flag untuk menjadikan pesan hanya bisa dilihat oleh pengirim
+        ephemeral: true,
       });
     }
 
-    // Validasi YouTube URL
-    if (!ytdl.validateURL(url)) {
-      return interaction.editReply({
+    // Check if the URL is valid
+    if (!play.yt_validate(url)) {
+      return interaction.reply({
         content: "❌ Invalid YouTube URL.",
-        flags: 64, // Flag untuk menjadikan pesan hanya bisa dilihat oleh pengirim
+        ephemeral: true,
       });
     }
+
+    await interaction.deferReply();
 
     try {
-      // Mendapatkan stream audio dari URL YouTube
-      const stream = ytdl(url, {
-        filter: "audioonly",
-        quality: "highestaudio",
-      });
+      // Try fetching the stream with play-dl
+      const { stream, format } = await play.stream(url);
+      console.log("Stream fetched with play-dl:", stream);
+      console.log("Stream format:", format);
 
-      const resource = createAudioResource(stream, {
-        inputType: AudioInputType.Opus, // Menentukan jenis input audio (opus untuk audio YouTube)
+      const resource = createAudioResource(stream.stream, {
+        inputType: stream.type, // Make sure input type is valid
       });
-      console.log("Audio Resource Created:", resource);
 
       const player = createAudioPlayer();
-      player.play(resource);
-      console.log("Audio player started");
 
       const connection = joinVoiceChannel({
         channelId: voiceChannel.id,
         guildId: voiceChannel.guild.id,
         adapterCreator: voiceChannel.guild.voiceAdapterCreator,
       });
-      console.log("Bot connected to voice channel.");
 
       connection.subscribe(player);
       player.play(resource);
 
       player.on(AudioPlayerStatus.Idle, () => {
-        console.log("Player has finished playing, destroying connection.");
+        console.log("Audio finished, disconnecting...");
         connection.destroy();
-      });
-
-      connection.on(VoiceConnectionStatus.Ready, () => {
-        console.log("Voice connection is ready.");
       });
 
       connection.on(VoiceConnectionStatus.Disconnected, async () => {
         try {
-          await entersState(connection, VoiceConnectionStatus.Ready, 5_000),  console.log("Voice connection was disconnected.");					;
+          await entersState(connection, VoiceConnectionStatus.Ready, 5_000);
         } catch {
           connection.destroy();
         }
       });
 
-      // Setelah audio dimainkan, beri respon dengan editReply
       await interaction.editReply({
         content: `🎶 Now playing: ${url}`,
       });
     } catch (err) {
-      console.error("Error playing audio:", err);
-      await interaction.editReply({
-        content: "❌ Failed to play the audio. Check the URL or try again.",
-        flags: 64, // Flag untuk menjadikan pesan hanya bisa dilihat oleh pengirim
-      });
+      console.error("Error while playing audio with play-dl:", err);
+
+      // If play-dl fails, try using ytdl-core as a fallback
+      try {
+        console.log("Falling back to ytdl-core");
+
+        const stream = ytdl(url, { filter: 'audioonly' });
+        const resource = createAudioResource(stream, { inputType: 'opus' });
+
+        const player = createAudioPlayer();
+
+        const connection = joinVoiceChannel({
+          channelId: voiceChannel.id,
+          guildId: voiceChannel.guild.id,
+          adapterCreator: voiceChannel.guild.voiceAdapterCreator,
+        });
+
+        connection.subscribe(player);
+        player.play(resource);
+
+        player.on(AudioPlayerStatus.Idle, () => {
+          console.log("Audio finished, disconnecting...");
+          connection.destroy();
+        });
+
+        connection.on(VoiceConnectionStatus.Disconnected, async () => {
+          try {
+            await entersState(connection, VoiceConnectionStatus.Ready, 5_000);
+          } catch {
+            connection.destroy();
+          }
+        });
+
+        await interaction.editReply({
+          content: `🎶 Now playing: ${url}`,
+        });
+      } catch (err) {
+        console.error("Error with ytdl-core:", err);
+        await interaction.editReply({
+          content: "❌ Failed to play the audio. Check the URL or try again.",
+        });
+      }
     }
   },
 };
