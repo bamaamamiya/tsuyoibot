@@ -7,7 +7,7 @@ const {
   entersState,
   VoiceConnectionStatus,
 } = require("@discordjs/voice");
-const play = require("play-dl");
+const ytdl = require("ytdl-core");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -38,7 +38,7 @@ module.exports = {
     }
 
     // Validasi YouTube URL
-    if (!play.yt_validate(url)) {
+    if (!ytdl.validateURL(url)) {
       return interaction.editReply({
         content: "❌ Invalid YouTube URL.",
         ephemeral: true,
@@ -46,12 +46,10 @@ module.exports = {
     }
 
     try {
-      const { stream, format } = await play.stream(url);
-      console.log("Stream fetched:", stream);
-      console.log("Format:", format);
-
-      const resource = createAudioResource(stream.stream, {
-        inputType: stream.type,
+      // Mendapatkan stream audio dari URL YouTube
+      const stream = ytdl(url, { filter: "audioonly" });
+      const resource = createAudioResource(stream, {
+        inputType: "opus", // Menentukan jenis input audio (opus untuk audio YouTube)
       });
 
       const player = createAudioPlayer();
